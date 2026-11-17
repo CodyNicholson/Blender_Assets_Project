@@ -56,6 +56,8 @@ STATIC = {
     # Shattered Skies campaign.
     "SM_Ship_SovereignGale": (_SHIP, story_ships.sovereign_gale),
     "SM_Ship_SovereignGaleWrecked": (_SHIP, story_ships.sovereign_gale_wrecked),
+    "SM_Ship_SovereignGaleSteel": (_SHIP, story_ships.sovereign_gale_steel),
+    "SM_Ship_SovereignGaleGoldBlackRed": (_SHIP, story_ships.sovereign_gale_gold_black_red),
     "SM_Ship_RustWing": (_SHIP, story_ships.rust_wing),
     "SM_Ship_IronMaw": (_SHIP, story_ships.iron_maw),
     "SM_Ship_Mirage": (_SHIP, story_ships.mirage),
@@ -237,6 +239,8 @@ DEFAULT_FACTIONS = {
     "SM_Ship_ArmadaCorvette": "Gilded",
     "SM_Ship_ArmadaFrigate": "Gilded",
     "SM_Ship_AssaultGlider": "Gilded",
+    "SM_Ship_SovereignGaleSteel": "Warden",
+    "SM_Ship_SovereignGaleGoldBlackRed": "Obsidian",
     "SM_Prop_SiegeCannon": "Gilded",
     "SM_Prop_Missile": "Gilded",
     "SM_Prop_ArmadaBanner": "Gilded",

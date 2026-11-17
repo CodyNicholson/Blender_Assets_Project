@@ -4051,41 +4051,123 @@ EXTRA_CLIPS["Morrow"] = MORROW_CLIPS
 
 # ---- Roxanne's own moves -----------------------------------------------------------------------------
 _ROXANNE_CROUCH = dict(
-    thigh__L=(-44, -4, 0), shin__L=(60, 0, 0), foot__L=(-16, 0, 0),
-    thigh__R=(26, 4, 0), shin__R=(48, 0, 0), foot__R=(-10, 0, 0),
-    hips_loc=(0, 0, -0.22),
-    chest=(16, 0, 14), spine=(8, 0, 6), head=(-12, 0, -12),
-    upper_arm__R=(-76, 10, 0), lower_arm__R=(-20, 0, 0),
-    upper_arm__L=(-72, -18, 0), lower_arm__L=(-55, 0, 0),
+    thigh__L=(-18, -5, 0), shin__L=(26, 0, 0), foot__L=(-8, 0, 0),
+    thigh__R=(14, 5, 0), shin__R=(18, 0, 0), foot__R=(-14, 0, 0),
+    hips_loc=(0, 0, -0.06),
+    spine=(4, 0, -8), chest=(8, 0, -12), head=(-10, 0, 18),
+    upper_arm__R=(-70, 0, 16), lower_arm__R=(-38, 0, 10), hand__R=(34, 0, 34),
+    upper_arm__L=(-68, 0, -16), lower_arm__L=(-50, 0, -10),
 )
 
 _ROXANNE_THRUST = dict(
-    thigh__L=(-32, -3, 0), shin__L=(28, 0, 0), thigh__R=(24, 3, 0), shin__R=(14, 0, 0),
-    hips_loc=(0, -0.12, -0.06),
-    chest=(22, 0, 18), spine=(8, 0, 8), head=(-12, 0, -14),
-    upper_arm__R=(-96, 4, 0), lower_arm__R=(-4, 0, 0),
-    upper_arm__L=(-50, -16, 0), lower_arm__L=(-40, 0, 0),
+    thigh__L=(-34, -3, 0), shin__L=(34, 0, 0), foot__L=(-2, 0, 0),
+    thigh__R=(26, 3, 0), shin__R=(16, 0, 0), foot__R=(-14, 0, 0),
+    hips_loc=(0, -0.14, -0.07),
+    spine=(8, 0, 10), chest=(22, 0, 24), head=(-20, 0, -22),
+    upper_arm__R=(-92, 4, 0), lower_arm__R=(-4, 0, 0), hand__R=(62, 0, 0),
+    upper_arm__L=(28, -20, 0), lower_arm__L=(-62, 0, 0),
+)
+
+_ROXANNE_FLURRY_COCK_A = dict(
+    thigh__L=(-34, -4, 0), shin__L=(40, 0, 0), foot__L=(-6, 0, 0),
+    thigh__R=(26, 4, 0), shin__R=(22, 0, 0), foot__R=(-12, 0, 0),
+    hips_loc=(0, 0.06, -0.10),
+    spine=(6, 0, -10), chest=(12, 0, -26), head=(-12, 0, 24),
+    upper_arm__R=(38, 18, 0), lower_arm__R=(-114, 0, 0), hand__R=(50, 0, 0),
+    upper_arm__L=(-74, 8, 0), lower_arm__L=(-28, 0, 0),
 )
 
 ROXANNE_CLIPS = {
     "LanceCrouch": (True, {
         0: _p(**_ROXANNE_CROUCH),
-        12: _p(**{**_ROXANNE_CROUCH, "chest": (14, 0, 14), "hips_loc": (0, 0, -0.21)}),
+        12: _p(**{**_ROXANNE_CROUCH, "chest": (10, 0, -12), "upper_arm__R": (-74, 0, 16), "upper_arm__L": (-72, 0, -16), "hips_loc": (0, 0, -0.07)}),
         24: _p(**_ROXANNE_CROUCH),
     }),
     "LanceThrust": (False, {
         0: _p(),
-        4: _p(upper_arm__R=(-50, 12, 0), lower_arm__R=(-65, 0, 0), upper_arm__L=(-40, -14, 0), lower_arm__L=(-50, 0, 0), chest=(-8, 0, -10), spine=(-4, 0, -4)),
+        4: _p(
+            thigh__L=(-24, -3, 0), shin__L=(30, 0, 0),
+            thigh__R=(18, 3, 0), shin__R=(18, 0, 0),
+            hips_loc=(0, 0.05, -0.08),
+            spine=(4, 0, -8), chest=(8, 0, -20), head=(-8, 0, 18),
+            upper_arm__R=(38, 16, 0), lower_arm__R=(-115, 0, 0), hand__R=(52, 0, 0),
+            upper_arm__L=(-64, 10, 0), lower_arm__L=(-32, 0, 0),
+        ),
         8: _p(**_ROXANNE_THRUST),
-        12: _p(**{**_ROXANNE_THRUST, "upper_arm__R": (-88, 6, 0), "lower_arm__R": (-14, 0, 0)}),
+        12: _p(**{**_ROXANNE_THRUST, "upper_arm__R": (-86, 6, 0), "lower_arm__R": (-12, 0, 0), "hand__R": (64, 0, 0)}),
         18: _p(),
     }),
     "LanceImpale": (False, {
         0: _p(),
-        6: _p(upper_arm__R=(-40, 14, 0), lower_arm__R=(-70, 0, 0), upper_arm__L=(-45, -16, 0), lower_arm__L=(-55, 0, 0), chest=(-12, 0, -14), hips_loc=(0, 0.08, -0.08), thigh__L=(-14, -2, 0), thigh__R=(18, 2, 0)),
-        12: _p(upper_arm__R=(-110, 2, 0), lower_arm__R=(-2, 0, 0), upper_arm__L=(-65, -20, 0), lower_arm__L=(-35, 0, 0), chest=(28, 0, 16), spine=(10, 0, 8), head=(-16, 0, -12), hips_loc=(0, -0.22, 0.12), thigh__L=(-55, -4, 0), shin__L=(48, 0, 0), thigh__R=(32, 4, 0), shin__R=(24, 0, 0)),
-        18: _p(**_ROXANNE_THRUST),
-        26: _p(),
+        4: _p(
+            thigh__L=(-42, -4, 0), shin__L=(68, 0, 0), foot__L=(-18, 0, 0),
+            thigh__R=(14, 4, 0), shin__R=(52, 0, 0), foot__R=(-20, 0, 0),
+            hips_loc=(0, 0.04, -0.14),
+            spine=(6, 0, -10), chest=(12, 0, -24), head=(-10, 0, 22),
+            upper_arm__R=(36, 18, 0), lower_arm__R=(-112, 0, 0), hand__R=(46, 0, 0),
+            upper_arm__L=(-62, 12, 0), lower_arm__L=(-35, 0, 0),
+        ),
+        9: _p(
+            thigh__L=(-58, -5, 0), shin__L=(90, 0, 0), foot__L=(-16, 0, 0),
+            thigh__R=(-18, 5, 0), shin__R=(78, 0, 0), foot__R=(-20, 0, 0),
+            hips_loc=(0, 0.04, 0.06),
+            spine=(-6, 0, -12), chest=(-12, 0, -26), head=(12, 0, 22),
+            upper_arm__R=(-70, 38, 0), lower_arm__R=(-52, 0, 0), hand__R=(115, 0, 0),
+            upper_arm__L=(-76, -10, 0), lower_arm__L=(-20, 0, 0),
+        ),
+        14: _p(
+            thigh__L=(-56, -4, 0), shin__L=(54, 0, 0), foot__L=(2, 0, 0),
+            thigh__R=(38, 4, 0), shin__R=(18, 0, 0), foot__R=(-16, 0, 0),
+            hips_loc=(0, -0.22, -0.15),
+            spine=(10, 0, 12), chest=(24, 0, 28), head=(-22, 0, -24),
+            upper_arm__R=(-90, 4, 0), lower_arm__R=(-4, 0, 0), hand__R=(64, 0, 0),
+            upper_arm__L=(46, -24, 0), lower_arm__L=(-58, 0, 0),
+        ),
+        19: _p(
+            thigh__L=(-58, -4, 0), shin__L=(56, 0, 0), foot__L=(2, 0, 0),
+            thigh__R=(40, 4, 0), shin__R=(18, 0, 0), foot__R=(-16, 0, 0),
+            hips_loc=(0, -0.24, -0.16),
+            spine=(10, 0, 12), chest=(26, 0, 28), head=(-24, 0, -24),
+            upper_arm__R=(-94, 4, 0), lower_arm__R=(-4, 0, 0), hand__R=(66, 0, 0),
+            upper_arm__L=(48, -24, 0), lower_arm__L=(-58, 0, 0),
+        ),
+        23: _p(
+            thigh__L=(-26, -3, 0), shin__L=(30, 0, 0), foot__L=(-4, 0, 0),
+            thigh__R=(16, 3, 0), shin__R=(20, 0, 0), foot__R=(-14, 0, 0),
+            hips_loc=(0, -0.06, -0.08),
+            spine=(4, 0, -4), chest=(6, 0, -8), head=(-6, 0, 8),
+            upper_arm__R=(28, 16, 0), lower_arm__R=(-105, 0, 0), hand__R=(52, 0, 0),
+            upper_arm__L=(-42, 8, 0), lower_arm__L=(-40, 0, 0),
+        ),
+        28: _p(),
+    }),
+    "LanceFlurry": (True, {
+        0: _p(**_ROXANNE_FLURRY_COCK_A),
+        3: _p(
+            thigh__L=(-44, -4, 0), shin__L=(46, 0, 0), foot__L=(-2, 0, 0),
+            thigh__R=(30, 4, 0), shin__R=(16, 0, 0), foot__R=(-14, 0, 0),
+            hips_loc=(0, -0.16, -0.07),
+            spine=(10, 0, 12), chest=(22, 0, 26), head=(-22, 0, -24),
+            upper_arm__R=(-86, 4, 0), lower_arm__R=(-4, 0, 0), hand__R=(60, 0, 0),
+            upper_arm__L=(36, -20, 0), lower_arm__L=(-68, 0, 0),
+        ),
+        6: _p(
+            thigh__L=(-32, -4, 0), shin__L=(38, 0, 0), foot__L=(-6, 0, 0),
+            thigh__R=(24, 4, 0), shin__R=(24, 0, 0), foot__R=(-12, 0, 0),
+            hips_loc=(0, 0.05, -0.11),
+            spine=(6, 0, -12), chest=(10, 0, -28), head=(-10, 0, 26),
+            upper_arm__R=(34, 24, 0), lower_arm__R=(-110, 0, 0), hand__R=(46, 0, 0),
+            upper_arm__L=(-68, 12, 0), lower_arm__L=(-36, 0, 0),
+        ),
+        9: _p(
+            thigh__L=(-46, -4, 0), shin__L=(48, 0, 0), foot__L=(-2, 0, 0),
+            thigh__R=(32, 4, 0), shin__R=(14, 0, 0), foot__R=(-14, 0, 0),
+            hips_loc=(0, -0.18, -0.03),
+            spine=(8, 0, 14), chest=(16, 0, 32), head=(-18, 0, -28),
+            upper_arm__R=(-110, -2, 0), lower_arm__R=(-4, 0, 0), hand__R=(74, 0, 0),
+            upper_arm__L=(40, -22, 0), lower_arm__L=(-62, 0, 0),
+        ),
+        12: _p(**_ROXANNE_FLURRY_COCK_A),
     }),
 }
 EXTRA_CLIPS["Roxanne"] = ROXANNE_CLIPS

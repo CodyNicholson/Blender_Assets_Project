@@ -85,6 +85,7 @@ SKILL_MEDALS = {
     "Skill_Fireball": SKILL_MAGIC, "Skill_ElectricCyclone": SKILL_MAGIC,
     "Skill_Gunslinger": SKILL_PHYSICAL, "Skill_HiddenCannon": SKILL_PHYSICAL, "Skill_Mutiny": SKILL_PHYSICAL,
     "Skill_Concoction": SKILL_HEAL, "Skill_PoisonSmog": SKILL_MAGIC, "Skill_Massacure": SKILL_PHYSICAL,
+    "Skill_ChopJab": SKILL_PHYSICAL, "Skill_Javelin": SKILL_PHYSICAL, "Skill_Helicopter": SKILL_PHYSICAL,
 }
 MEDALS.update(SKILL_MEDALS)
 
@@ -503,6 +504,31 @@ def _skill_layers(name, g):
         sparks = union(g.star(0.48, 0.56, 0.22, 0.08, 6), g.star(0.62, 0.38, 0.18, 0.06, 5), g.star(0.26, 0.65, 0.15, 0.05, 4))
         blood = union(g.poly((0.35, 0.35), (0.58, 0.48), (0.48, 0.58)), g.circle(0.42, 0.32, 0.08))
         return [(sparks, ORANGE), (engine, IRON), (bar, STEEL), (teeth, WHITE), (blood, RED)]
+    if name == "Skill_ChopJab":
+        shaft = g.line(-0.68, -0.58, 0.38, 0.48, 0.055)
+        spear = g.poly((0.28, 0.38), (0.46, 0.56), (0.76, 0.78), (0.54, 0.48), (0.36, 0.3))
+        axe = cut(g.poly((0.02, 0.42), (0.36, 0.24), (0.5, -0.14), (0.14, 0.02)), g.circle(-0.08, 0.08, 0.14))
+        arc = clip(g.ring(0.15, 0.1, 0.68, 0.055), g.box(0.48, 0.1, 0.45, 0.7))
+        jab = union(g.line(0.42, 0.72, 0.8, 0.86, 0.035), g.line(0.62, 0.36, 0.88, 0.54, 0.035))
+        return [(arc, ORANGE), (jab, SPARK), (shaft, BROWN), (axe, GOLD), (spear, WHITE)]
+    if name == "Skill_Javelin":
+        shaft = g.line(-0.74, -0.66, 0.46, 0.48, 0.055)
+        spear = g.poly((0.36, 0.38), (0.54, 0.56), (0.86, 0.84), (0.58, 0.42), (0.38, 0.3))
+        axe = g.poly((0.12, 0.44), (0.4, 0.26), (0.44, -0.02), (0.18, 0.14))
+        trails = union(g.line(-0.86, -0.22, -0.34, 0.28, 0.04), g.line(-0.32, -0.84, 0.22, -0.34, 0.04), g.line(-0.84, -0.52, -0.44, -0.14, 0.035))
+        return [(trails, CYAN), (shaft, BROWN), (axe, GOLD), (spear, WHITE)]
+    if name == "Skill_Helicopter":
+        spin = union(
+            clip(g.ring(0, 0, 0.72, 0.065), g.box(0, 0.34, 0.86, 0.48)),
+            clip(g.ring(0, 0, 0.72, 0.065), g.box(0, -0.34, 0.86, 0.48)),
+            g.poly((0.72, 0.02), (0.52, 0.26), (0.86, 0.24)),
+            g.poly((-0.72, -0.02), (-0.52, -0.26), (-0.86, -0.24)),
+        )
+        shaft = g.line(-0.68, -0.04, 0.62, 0.04, 0.06)
+        spear = g.poly((0.52, 0.12), (0.9, 0.04), (0.52, -0.04))
+        axe = g.poly((0.18, 0.04), (0.5, 0.38), (0.64, 0.16), (0.34, -0.02))
+        hub = g.circle(0, 0, 0.15)
+        return [(spin, CYAN), (shaft, BROWN), (axe, GOLD), (spear, WHITE), (hub, IRON_DARK)]
     return None
 
 

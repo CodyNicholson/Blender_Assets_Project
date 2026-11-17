@@ -82,7 +82,12 @@ ICON_SIZES = {"HQ": 256, "LQ": 128}
 
 # Icons rendered from the real models: icon name: model base name.
 MODEL_ICONS = {
+    "Ship_Sloop": "SM_Ship_Sloop",
+    "Ship_Brigantine": "SM_Ship_Brigantine",
+    "Ship_Galleon": "SM_Ship_Galleon",
     "Ship_SovereignGale": "SM_Ship_SovereignGale",
+    "Ship_SovereignGaleSteel": "SM_Ship_SovereignGaleSteel",
+    "Ship_SovereignGaleGoldBlackRed": "SM_Ship_SovereignGaleGoldBlackRed",
     "Ship_RustWing": "SM_Ship_RustWing",
     "Ship_IronMaw": "SM_Ship_IronMaw",
     "Ship_Mirage": "SM_Ship_Mirage",
@@ -197,4 +202,5 @@ GLYPH_ICONS = (
     "Skill_PoisonArrows", "Skill_DaggerDance", "Skill_Fireball", "Skill_ElectricCyclone",
     "Skill_Gunslinger", "Skill_HiddenCannon", "Skill_Mutiny",
     "Skill_Concoction", "Skill_PoisonSmog", "Skill_Massacure",
+    "Skill_ChopJab", "Skill_Javelin", "Skill_Helicopter",
 )

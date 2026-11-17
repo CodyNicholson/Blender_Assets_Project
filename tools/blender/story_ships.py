@@ -21,7 +21,7 @@ def cosine_ts(count):
     return [0.5 - 0.5 * math.cos(math.pi * i / count) for i in range(count + 1)]
 
 
-def shell(mb, stations, rows, paint, power=0.75, tumble=0.0):
+def shell(mb, stations, rows, paint, power=0.75, tumble=0.0, deck_color="wood_deck", cell_paint=None):
     """Closed hull from (y, half_width, keel_z, deck_z) stations. paint(row) colours the sides."""
     rings = []
     for y, width, keel, deck in stations:
@@ -33,10 +33,15 @@ def shell(mb, stations, rows, paint, power=0.75, tumble=0.0):
             side.append((x, y, keel + (deck - keel) * rise))
         rings.append(side + [(-x, yy, z) for x, yy, z in reversed(side[1:])])
 
-    def colour(_i, j):
+    def colour(i, j):
         if j == rows:
-            return "wood_deck"
-        return paint(j if j < rows else 2 * rows - j)
+            return deck_color
+        row = j if j < rows else 2 * rows - j
+        if cell_paint is not None:
+            c = cell_paint(i, row)
+            if c is not None:
+                return c
+        return paint(row)
 
     mb.loft(rings, colour)
 
@@ -95,20 +100,20 @@ def sail(mb, y, z_top, z_bot, half, belly, hq, color="canvas", tatter=False):
     mb.loft(rings, color)
 
 
-def mast(mb, x, y, z0, z1, r, hq, yards=()):
-    mb.tube((x, y, z0), (x, y, z1), r, r * 0.55, sides=_q(hq, 6, 3), color="wood_mid")
+def mast(mb, x, y, z0, z1, r, hq, yards=(), pole_color="wood_mid", yard_color="wood_dark"):
+    mb.tube((x, y, z0), (x, y, z1), r, r * 0.55, sides=_q(hq, 6, 3), color=pole_color)
     for z, half in yards:
-        mb.tube((x - half, y, z), (x + half, y, z), r * 0.45, sides=_q(hq, 4, 3), color="wood_dark")
+        mb.tube((x - half, y, z), (x + half, y, z), r * 0.45, sides=_q(hq, 4, 3), color=yard_color)
 
 
 def rope(mb, a, b, r, hq, color="rope"):
     mb.tube(a, b, r, sides=_q(hq, 4, 3), color=color)
 
 
-def nacelle(mb, x, y, z, length, r, hq, label, root_x=None, color="brass", index=0):
+def nacelle(mb, x, y, z, length, r, hq, label, root_x=None, color="brass", index=0, pylon_color="iron"):
     """Pod with a propeller socket at its tail. root_x adds a pylon back to the hull."""
     if root_x is not None:
-        mb.tube((root_x, y, z), (x, y, z), r * 0.34, sides=_q(hq, 4, 3), color="iron")
+        mb.tube((root_x, y, z), (x, y, z), r * 0.34, sides=_q(hq, 4, 3), color=pylon_color)
     if hq:
         mb.path([(x, y - length, z), (x, y - length * 0.5, z), (x, y + length * 0.5, z), (x, y + length, z)], [r * 0.35, r, r, r * 0.55], 8, color, smooth=True)
     else:
@@ -182,21 +187,42 @@ def _gale_width(t):
     return half
 
 
-def _gale_hull(mb, hq, wrecked=False):
+def _gale_hull(mb, hq, wrecked=False, variant=None):
     length = 38.0
     rows = _q(hq, 7, 3)
     bands = {0: "wood_dark", 1: "navy", 2: "wood_dark", 3: "faction_a", 4: "wood_dark", 5: "gold_dark", 6: "wood_mid"}
     lq_bands = {0: "wood_dark", 1: "wood_dark", 2: "faction_a"}
+    deck_color = "wood_deck"
+    cell_paint = None
     if wrecked:
         # Charred: the gilding and paint have burned off.
         bands = {0: "storm_dark", 1: "wood_dark", 2: "abyss", 3: "rust_dark", 4: "abyss", 5: "wood_dark", 6: "storm_dark"}
         lq_bands = {0: "storm_dark", 1: "abyss", 2: "rust_dark"}
+    elif variant == "steel":
+        bands = {0: "iron", 1: "steel", 2: "iron_light", 3: "steel", 4: "iron", 5: "silver", 6: "steel"}
+        lq_bands = {0: "iron", 1: "steel", 2: "iron_light"}
+        deck_color = "steel"
+        if hq:
+            cell_paint = lambda i, r: "iron_light" if (r in (1, 3, 6) and (i + r) % 2 == 0) else ("silver" if r == 5 else None)
+    elif variant == "gold_black_red":
+        bands = {0: "abyss", 1: "cloth_black", 2: "gold", 3: "gem_red", 4: "cloth_black", 5: "gold", 6: "velvet"}
+        lq_bands = {0: "cloth_black", 1: "gem_red", 2: "gold"}
+        deck_color = "cloth_black"
     stations = []
     for t in cosine_ts(_q(hq, 16, 8)):
         keel = 3.8 * (1 - t / 0.34) ** 2 if t < 0.34 else (2.6 * ((t - 0.72) / 0.28) ** 2 if t > 0.72 else 0.0)
         deck = 7.6 + (2.2 * (1 - t / 0.3) ** 2 if t < 0.3 else (2.0 * ((t - 0.62) / 0.38) ** 2 if t > 0.62 else 0.0))
         stations.append((-length / 2 + t * length, _gale_width(t), keel, deck))
-    shell(mb, stations, rows, lambda r: (bands if hq else lq_bands)[r], power=0.55, tumble=0.14)
+    shell(
+        mb,
+        stations,
+        rows,
+        lambda r: (bands if hq else lq_bands)[r],
+        power=0.55,
+        tumble=0.14,
+        deck_color=deck_color,
+        cell_paint=cell_paint,
+    )
     return length
 
 
@@ -204,17 +230,32 @@ def _deck_y(t, length=38.0):
     return -length / 2 + t * length
 
 
-def sovereign_gale(mb, hq, wrecked=False):
+def sovereign_gale(mb, hq, wrecked=False, variant=None):
     """3-deck dreadnought: triple envelope, tiered stern gallery, gilded figurehead."""
-    length = _gale_hull(mb, hq, wrecked)
+    length = _gale_hull(mb, hq, wrecked, variant=variant)
     deck_z = 7.6
     y_of = _deck_y
+
+    is_steel = variant == "steel"
+    is_gbr = variant == "gold_black_red"
+
+    if is_steel and hq:
+        # Heavy bolted steel casemate armor sponsons along the midship gun decks.
+        for sign in (1, -1):
+            for t_plate in (0.36, 0.56):
+                y_p = y_of(t_plate)
+                w_p = _gale_width(t_plate)
+                mb.box((sign * (w_p * 0.96), y_p, 4.4), (0.32, 4.8, 3.6), "iron_light")
+
     # Stern castle: two stepped tiers with a lit gallery across the transom.
     y0, y1 = y_of(0.74), y_of(0.985)
-    mb.box((0, (y0 + y1) / 2, deck_z + 2.1), (7.2, y1 - y0, 3.4), "wood_red", top_scale=0.92)
-    mb.box((0, (y0 + y1) / 2 + 1.0, deck_z + 4.5), (5.4, (y1 - y0) * 0.72, 1.9), "faction_c", top_scale=0.9)
-    mb.box((0, (y0 + y1) / 2, deck_z + 3.92), (7.6, y1 - y0 + 0.5, 0.26), "gold_dark")
-    mb.box((0, (y0 + y1) / 2 + 1.0, deck_z + 5.5), (5.8, (y1 - y0) * 0.78, 0.2), "gold_dark")
+    stern_low_c = "steel" if is_steel else ("cloth_black" if is_gbr else "wood_red")
+    stern_high_c = "iron_light" if is_steel else ("gem_red" if is_gbr else "faction_c")
+    stern_trim_c = "silver" if is_steel else ("gold" if is_gbr else "gold_dark")
+    mb.box((0, (y0 + y1) / 2, deck_z + 2.1), (7.2, y1 - y0, 3.4), stern_low_c, top_scale=0.92)
+    mb.box((0, (y0 + y1) / 2 + 1.0, deck_z + 4.5), (5.4, (y1 - y0) * 0.72, 1.9), stern_high_c, top_scale=0.9)
+    mb.box((0, (y0 + y1) / 2, deck_z + 3.92), (7.6, y1 - y0 + 0.5, 0.26), stern_trim_c)
+    mb.box((0, (y0 + y1) / 2 + 1.0, deck_z + 5.5), (5.8, (y1 - y0) * 0.78, 0.2), stern_trim_c)
     if hq:
         _window_strip(mb, [-2.5, -1.25, 0, 1.25, 2.5], y1 + 0.03, deck_z + 2.2, (0.8, 1.5), 0.1, "ember" if wrecked else "lamp")
         _window_strip(mb, [-1.6, 0, 1.6], y1 + 0.03, deck_z + 4.5, (0.9, 0.9), 0.1, "ember" if wrecked else "lamp")
@@ -225,27 +266,32 @@ def sovereign_gale(mb, hq, wrecked=False):
         mb.box((0, y1 + 0.03, deck_z + 2.2), (6.0, 0.1, 1.5), "ember" if wrecked else "lamp")
     # Forecastle.
     fy0, fy1 = y_of(0.13), y_of(0.26)
-    mb.box((0, (fy0 + fy1) / 2, deck_z + 2.1), (5.0, fy1 - fy0, 1.9), "wood_red", top_scale=0.86)
+    mb.box((0, (fy0 + fy1) / 2, deck_z + 2.1), (5.0, fy1 - fy0, 1.9), stern_low_c, top_scale=0.86)
     # Figurehead: a winged gale spirit on the cutwater, the ship's calling card.
     bow = (0, y_of(0.0) - 0.4, 9.3)
-    mb.tube((0, y_of(0.03), 7.8), (0, y_of(0.0) - 8.0, 11.8), 0.5, 0.06, sides=_q(hq, 6, 3), color="wood_dark")
+    sprit_c = "iron" if is_steel else ("cloth_black" if is_gbr else "wood_dark")
+    fig_c = "silver" if is_steel else "gold"
+    mb.tube((0, y_of(0.03), 7.8), (0, y_of(0.0) - 8.0, 11.8), 0.5, 0.06, sides=_q(hq, 6, 3), color=sprit_c)
     if hq:
-        mb.sphere((bow[0], bow[1] - 0.2, bow[2] + 0.9), (0.42, 0.42, 0.5), 8, 4, "gold")
-        mb.path([(0, bow[1], bow[2] - 1.0), (0, bow[1] - 0.2, bow[2]), (0, bow[1] - 0.2, bow[2] + 0.6)], [0.3, 0.55, 0.32], 6, "gold")
+        mb.sphere((bow[0], bow[1] - 0.2, bow[2] + 0.9), (0.42, 0.42, 0.5), 8, 4, fig_c)
+        mb.path([(0, bow[1], bow[2] - 1.0), (0, bow[1] - 0.2, bow[2]), (0, bow[1] - 0.2, bow[2] + 0.6)], [0.3, 0.55, 0.32], 6, fig_c)
     for sign in (1, -1):
-        mb.plate([(sign * 0.2, bow[1], bow[2] + 0.5), (sign * 3.0, bow[1] + 1.6, bow[2] + 2.8), (sign * 2.5, bow[1] + 2.0, bow[2] + 0.9), (sign * 0.2, bow[1] + 0.4, bow[2] - 0.5)], 0.1, "gold")
+        mb.plate([(sign * 0.2, bow[1], bow[2] + 0.5), (sign * 3.0, bow[1] + 1.6, bow[2] + 2.8), (sign * 2.5, bow[1] + 2.0, bow[2] + 0.9), (sign * 0.2, bow[1] + 0.4, bow[2] - 0.5)], 0.1, fig_c)
 
     # Three gun decks.
     half_at = lambda y: _gale_width((y + length / 2) / length)
     tiers = ((2.5, "a"), (4.3, "b"), (6.1, "c"))
+    gun_carriage = "iron" if is_steel else ("gold_dark" if is_gbr else "wood_dark")
+    gun_barrel = "steel" if is_steel else ("cloth_black" if is_gbr else "iron")
     for z, tag in tiers:
         ys = [y_of(0.3 + 0.42 * (i + 0.5) / 7) for i in range(7)]
         draw = hq or tag != "b"
-        broadside(mb, ys, z, half_at, 1.5, 0.21, hq, draw=draw, tag=tag, lean=True)
+        broadside(mb, ys, z, half_at, 1.5, 0.21, hq, draw=draw, tag=tag, carriage=gun_carriage, color=gun_barrel, lean=True)
     # Triple envelope.
     z_centre = deck_z + 12.2
     rings = _q(hq, 12, 6)
     sides = _q(hq, 16, 8)
+    bag_colors = ("steel", "iron_light", "iron") if is_steel else (("cloth_black", "gem_red", "gold") if is_gbr else ("faction_a", "faction_b", "faction_c"))
     if wrecked:
         # Holed and sagging: the belly drops and the panels tear to dark.
         def torn(i, j):
@@ -258,55 +304,73 @@ def sovereign_gale(mb, hq, wrecked=False):
             return "faction_a" if j % 2 else "canvas_dark"
         gasbag(mb, 0, 0.5, z_centre - 1.5, 32, 5.8, sides, rings, torn, flat=0.62)
     else:
-        gasbag(mb, 0, 0.5, z_centre, 32, 6.4, sides, rings, striped("faction_a", "faction_b", "faction_c", rings))
+        gasbag(mb, 0, 0.5, z_centre, 32, 6.4, sides, rings, striped(bag_colors[0], bag_colors[1], bag_colors[2], rings))
     if hq:
+        band_c = "silver" if is_steel else ("gold" if is_gbr else "gold_dark")
         for s in (0.25, 0.5, 0.75):
-            gasbag_band(mb, 0, 0.5, z_centre - (1.5 if wrecked else 0), 32, 5.8 if wrecked else 6.4, s, sides, "gold_dark", flat=0.62 if wrecked else 1.0)
+            gasbag_band(mb, 0, 0.5, z_centre - (1.5 if wrecked else 0), 32, 5.8 if wrecked else 6.4, s, sides, band_c, flat=0.62 if wrecked else 1.0)
     side_rings = _q(hq, 10, 5)
     side_sides = _q(hq, 12, 6)
+    rope_c = "steel" if is_steel else ("gold_dark" if is_gbr else "rope")
     for sign in (1, -1):
         if wrecked and sign == -1:
             continue  # The starboard bag has burned away entirely.
-        gasbag(mb, sign * 9.2, 3.0, z_centre - 5.4, 24, 3.7, side_sides, side_rings, striped("faction_a", "faction_b", "faction_c", side_rings))
-        rope(mb, (sign * 4.6, 3.0, deck_z), (sign * 8.2, 3.0, z_centre - 8.6), 0.13, hq)
-        rope(mb, (sign * 4.6, -4.0, deck_z), (sign * 8.2, -4.0, z_centre - 8.2), 0.13, hq)
+        gasbag(mb, sign * 9.2, 3.0, z_centre - 5.4, 24, 3.7, side_sides, side_rings, striped(bag_colors[0], bag_colors[1], bag_colors[2], side_rings))
+        rope(mb, (sign * 4.6, 3.0, deck_z), (sign * 8.2, 3.0, z_centre - 8.6), 0.13, hq, color=rope_c)
+        rope(mb, (sign * 4.6, -4.0, deck_z), (sign * 8.2, -4.0, z_centre - 8.2), 0.13, hq, color=rope_c)
     # Lift rig to the central bag.
     for t in _q(hq, (0.22, 0.42, 0.62, 0.8), (0.3, 0.7)):
         for sign in (1, -1):
-            rope(mb, (sign * 4.2, y_of(t), deck_z), (sign * 2.4, y_of(t) * 0.8, z_centre - 5.6), 0.13, hq)
-    fins(mb, 0, 11.0, z_centre + 2.0, 6.0, 5.8, 0.18, "faction_c")
+            rope(mb, (sign * 4.2, y_of(t), deck_z), (sign * 2.4, y_of(t) * 0.8, z_centre - 5.6), 0.13, hq, color=rope_c)
+    fin_c = "steel" if is_steel else ("gem_red" if is_gbr else "faction_c")
+    fins(mb, 0, 11.0, z_centre + 2.0, 6.0, 5.8, 0.18, fin_c)
     # Masts stand in the gap under the bag, with war sails.
+    mast_pole_c = "iron" if is_steel else ("cloth_black" if is_gbr else "wood_mid")
+    mast_yard_c = "steel" if is_steel else ("gold" if is_gbr else "wood_dark")
     for i, t in enumerate((0.3, 0.48, 0.66)):
         y = y_of(t)
         top = z_centre - 5.5
         snapped = wrecked and i == 1
         h = (top - deck_z) * (0.45 if snapped else 1.0)
-        mast(mb, 0, y, deck_z - 0.1, deck_z + h, 0.3, hq, yards=() if snapped else ((deck_z + h * 0.92, 4.2),))
+        mast(mb, 0, y, deck_z - 0.1, deck_z + h, 0.3, hq, yards=() if snapped else ((deck_z + h * 0.92, 4.2),), pole_color=mast_pole_c, yard_color=mast_yard_c)
         if not snapped:
-            sail(mb, y - 0.15, deck_z + h * 0.9, deck_z + h * 0.22, 4.0, 0.9, hq, color="faction_a" if i == 1 else "canvas", tatter=wrecked)
+            if is_steel:
+                sail_c = "iron_light" if i == 1 else "silver"
+            elif is_gbr:
+                sail_c = "gem_red" if i == 1 else "cloth_black"
+            else:
+                sail_c = "faction_a" if i == 1 else "canvas"
+            sail(mb, y - 0.15, deck_z + h * 0.9, deck_z + h * 0.22, 4.0, 0.9, hq, color=sail_c, tatter=wrecked)
     # Rear wings.
+    wing_c = "steel" if is_steel else ("gem_red" if is_gbr else "faction_a")
+    wing_spar_c = "iron" if is_steel else ("gold" if is_gbr else "wood_dark")
     for sign in (1, -1):
         if wrecked and sign == -1:
-            wing(mb, sign, sign * 3.8, y_of(0.33), y_of(0.48), 5.8, 3.0, 0.2, hq, thick=0.16)
+            wing(mb, sign, sign * 3.8, y_of(0.33), y_of(0.48), 5.8, 3.0, 0.2, hq, color=wing_c, spar=wing_spar_c, thick=0.16)
             continue
-        wing(mb, sign, sign * 4.2, y_of(0.33), y_of(0.6), 5.8, 8.5, 2.8, hq, thick=0.16)
+        wing(mb, sign, sign * 4.2, y_of(0.33), y_of(0.6), 5.8, 8.5, 2.8, hq, color=wing_c, spar=wing_spar_c, thick=0.16)
     # Four engines.
+    nacelle_c = "steel" if is_steel else ("gold" if is_gbr else "brass")
+    pylon_c = "iron" if is_steel else ("cloth_black" if is_gbr else "iron")
     for index, (t, z) in enumerate(((0.8, 5.2), (0.55, 3.6))):
         for sign, label in ((1, "L"), (-1, "R")):
             y = y_of(t)
-            nacelle(mb, sign * 7.6, y, z, 2.0, 1.1, hq, label, root_x=sign * 4.4, color="brass", index=index)
+            nacelle(mb, sign * 7.6, y, z, 2.0, 1.1, hq, label, root_x=sign * 4.4, color=nacelle_c, index=index, pylon_color=pylon_c)
     # Rudder.
     y = y_of(0.995)
-    mb.plate([(0, y, 8.0), (0, y + 2.6, 6.8), (0, y + 3.4, 3.2), (0, y + 2.0, 1.8), (0, y, 3.0)], 0.2, "wood_dark")
+    rudder_c = "iron" if is_steel else ("cloth_black" if is_gbr else "wood_dark")
+    mb.plate([(0, y, 8.0), (0, y + 2.6, 6.8), (0, y + 3.4, 3.2), (0, y + 2.0, 1.8), (0, y, 3.0)], 0.2, rudder_c)
     if hq:
         # Helm, capstan and quarterdeck rail: the camera lands here in the finale.
-        mb.tube((0, y_of(0.71), deck_z), (0, y_of(0.71), deck_z + 0.9), 0.1, sides=4, color="wood_dark")
+        mb.tube((0, y_of(0.71), deck_z), (0, y_of(0.71), deck_z + 0.9), 0.1, sides=4, color=rudder_c)
+        wheel_c = "silver" if is_steel else ("gold" if is_gbr else "wood_light")
         with mb.xf(Matrix.Translation((0, y_of(0.71) - 0.1, deck_z + 1.1)) @ Matrix.Rotation(math.pi / 2, 4, "X")):
-            mb.lathe([(0.6, -0.05), (0.6, 0.05)], 10, "wood_light", smooth=False)
+            mb.lathe([(0.6, -0.05), (0.6, 0.05)], 10, wheel_c, smooth=False)
         for sign in (1, -1):
             points = [(sign * _gale_width(k) * 0.9, y_of(k), deck_z + 0.75) for k in (0.1, 0.25, 0.4, 0.55, 0.72)]
-            mb.path(points, [0.09] * len(points), 4, "gold_dark")
-        mb.box((0, y_of(0.5), deck_z + 0.08), (2.2, 3.4, 0.26), "iron")
+            mb.path(points, [0.09] * len(points), 4, stern_trim_c)
+        hatch_c = "steel" if is_steel else ("gem_red" if is_gbr else "iron")
+        mb.box((0, y_of(0.5), deck_z + 0.08), (2.2, 3.4, 0.26), hatch_c)
     base_sockets(mb, 5.0, deck_z, z_centre, y_of(0.82), deck_z + 6.5)
     mb.socket("lift_core", (0, y_of(0.5), 3.4))
     mb.socket("helm", (0, y_of(0.7), deck_z + 0.1))
@@ -319,6 +383,16 @@ def sovereign_gale(mb, hq, wrecked=False):
 def sovereign_gale_wrecked(mb, hq):
     """Prologue ending: the same ship after Morrow's sabotage, for its fall into the clouds."""
     sovereign_gale(mb, hq, wrecked=True)
+
+
+def sovereign_gale_steel(mb, hq):
+    """Steel-plated dreadnought variant of the Sovereign Gale."""
+    sovereign_gale(mb, hq, variant="steel")
+
+
+def sovereign_gale_gold_black_red(mb, hq):
+    """Gold, black, and red color scheme variant of the Sovereign Gale."""
+    sovereign_gale(mb, hq, variant="gold_black_red")
 
 
 # ---- The Rust-Wing / Armada Scout -----------------------------------------------------------
