@@ -186,6 +186,8 @@ def tempest_spire(mb, hq):
                 with mb.xf(Matrix.Translation((0, cy, zz))):
                     mb.lathe([(0.55, -0.08), (0.62, 0.0), (0.55, 0.08)], 8, "lightning" if kz > 0.7 else "brass", smooth=False)
         mb.sphere((0, cy, top_z + 0.25), 0.36, _q(hq, 8, 5), _q(hq, 5, 3), "lightning")
+        if idx == 0:
+            mb.socket("coil_tip", (0, cy, top_z + 0.25))  # Ball Lightning leaves from the bow coil's crown.
     # Glowing arc conduit connecting the coil tops.
     mb.path([(0, coil_ys[0], deck_z + 3.65), (0, coil_ys[1], deck_z + 4.45), (0, coil_ys[2], deck_z + 3.65)], [0.06, 0.08, 0.06], 4, "lightning")
 
@@ -463,6 +465,7 @@ def nebula_saucer(mb, hq):
     _torus_ring(mb, 0, 0, deck_z + 0.55, 3.05, 0.24, _q(hq, 12, 8), 4, "gold")
     # Ventral glowing tractor/antigrav dome.
     mb.sphere((0, 0, 0.55), (2.2, 2.2, 0.55), _q(hq, 10, 6), 4, "plasma")
+    mb.socket("bomb_bay", (0, 0, 0.0))  # The ATOM BOMB drops from under the tractor dome.
 
     # Forward twin pulse-cannon mandibles extending to -Y so bow direction is unmistakable.
     for sign in (1, -1):
@@ -502,17 +505,22 @@ def void_interceptor(mb, hq):
         )
     mb.sphere((0, bow_y - 2.4, 2.05), 0.78, _q(hq, 8, 6), 4, "plasma")
     mb.socket("muzzle_F0", (0, bow_y - 4.4, 2.1))
+    mb.socket("orb_muzzle", (0, bow_y - 3.2, 2.05))  # The void orbs leave from the front of the plasma orb.
 
     # Armored angular cockpit canopy.
     mb.box((0, y_of(0.55), deck_z + 0.65), (2.2, 5.2, 1.1), "abyss", top_scale=0.75)
     mb.box((0, y_of(0.45), deck_z + 0.72), (1.6, 2.4, 0.75), "liftstone", top_scale=0.7)
 
     # X-Wing style quad strike foils (upper and lower swept wings per side) with wingtip laser cannons.
+    x_gun = 0
     for sign, label in ((1, "L"), (-1, "R")):
         for vz, lift in ((2.3, 2.1), (1.5, -1.1)):
             wing(mb, sign, sign * 1.8, y_of(0.42), y_of(0.76), vz, 5.6, lift, hq, color="faction_a", spar="steel", thick=0.09, ribs=1)
             tip_x = sign * 7.35
             mb.tube((tip_x, y_of(0.76), vz + lift * 0.92), (tip_x, y_of(0.48), vz + lift * 0.98), 0.14, 0.07, sides=4, color="silver")
+            # The X-GUN: one gun at the front of each wingtip barrel.
+            mb.socket(f"muzzle_X{x_gun}", (tip_x, y_of(0.48) - 0.1, vz + lift * 0.98))
+            x_gun += 1
         nacelle(mb, sign * 2.8, y_of(0.82), 2.1, 1.7, 0.64, hq, label, root_x=sign * 1.6, color="steel")
         mb.socket(f"afterburner_{label}", (sign * 2.8, y_of(0.82) + 1.75, 2.1))
 
@@ -619,6 +627,7 @@ def solar_ark(mb, hq):
     # Central glowing solar-astrolabe sphere suspended above the deck.
     env_z = deck_z + 6.8
     mb.sphere((0, 0.0, env_z), 2.3, _q(hq, 12, 6), _q(hq, 8, 4), "lamp")
+    mb.socket("sun_core", (0, -2.3, env_z))  # The Sunbeam pours from the front of the sun-sphere.
     _torus_ring(mb, 0, 0.0, env_z, 3.1, 0.18, _q(hq, 12, 8), 4, "gold", rot_x=0.35)
     _torus_ring(mb, 0, 0.0, env_z, 3.5, 0.18, _q(hq, 12, 8), 4, "brass", rot_y=0.45)
     mb.tube((0, 0.0, deck_z - 0.1), (0, 0.0, env_z - 2.2), 0.28, 0.22, sides=_q(hq, 6, 4), color="gold")
@@ -921,6 +930,7 @@ def clockwork_sovereign(mb, hq):
     # Overhead multi-ring brass armillary sphere / clockwork orrery lift core.
     env_z = deck_z + 7.2
     mb.sphere((0, 0.0, env_z), 1.85, _q(hq, 10, 6), _q(hq, 6, 4), "lamp")
+    mb.socket("orb_front", (0, -1.95, env_z))  # The TIME STOP laser leaves from the front of the glowing orb.
     _torus_ring(mb, 0, 0.0, env_z, 3.2, 0.24, _q(hq, 12, 8), 4, "brass", rot_x=0.45)
     _torus_ring(mb, 0, 0.0, env_z, 3.8, 0.24, _q(hq, 12, 8), 4, "gold", rot_y=-0.5)
     _torus_ring(mb, 0, 0.0, env_z, 4.3, 0.2, _q(hq, 12, 8), 4, "iron", rot_x=1.2)
@@ -1346,6 +1356,8 @@ def powder_keg(mb, hq):
         mb.box((0, my, deck_z + 0.35), (2.4, 2.2, 0.7), "iron", top_scale=0.88)
         mb.tube((0, my + 0.3, deck_z + 0.6), (0, my - 1.3, deck_z + 2.3), 0.78, 0.68, sides=_q(hq, 10, 6), color="brass")
         mb.tube((0, my - 1.2, deck_z + 2.2), (0, my - 1.45, deck_z + 2.45), 0.6, 0.55, sides=_q(hq, 8, 5), color="abyss")
+        # Each mortar has its own muzzle for the fireball salvos; the fore one keeps its older names too.
+        mb.socket(f"siege_muzzle_{idx}", (0, my - 1.45, deck_z + 2.45))
         if idx == 0:
             mb.socket("siege_muzzle", (0, my - 1.45, deck_z + 2.45))
             mb.socket("muzzle_F0", (0, my - 1.45, deck_z + 2.45))

@@ -843,3 +843,199 @@ def lift_core_chamber(mb, hq):
         mb.socket(f"gravity_flip_{i}", (6.5 * math.cos(i * 2.1), 6.5 * math.sin(i * 2.1), floor))
     mb.socket("core", (0, 0, floor + 3.4))
     mb.socket("rupture_0", (7.8 * math.cos(0.8), 7.8 * math.sin(0.8), floor))
+
+
+# ---- Complete 360-degree Free Skies rock islands ---------------------------------------------
+
+def _closed_rock_island(mb, rng, rows, sides, top_color="grass", under=("rock_dark", "rock"), lump=0.14, rim_scale=1.05):
+    """Builds a single closed manifold rock spire + beveled top cap so normals face outward all 360 degrees."""
+    rings = []
+    ang_offsets = [rng.uniform(0.85, 1.15) for _ in range(sides)]
+    for idx, (radius, z, jitter) in enumerate(rows):
+        ring = []
+        for j in range(sides):
+            a = 2 * math.pi * j / sides
+            wave = 1.0 + lump * math.sin(3 * a + idx * 0.9) * 0.6
+            r = max(0.35, radius * ang_offsets[j] * wave + rng.uniform(-jitter * 0.5, jitter * 0.5))
+            dz = rng.uniform(-jitter * 0.35, jitter * 0.35) if 0 < idx < len(rows) - 1 else 0.0
+            ring.append((r * math.cos(a), r * math.sin(a), z + dz))
+        rings.append(ring)
+    top = rows[-1][1]
+    rim = [(x * rim_scale, y * rim_scale, top - 0.15) for x, y, _ in rings[-1]]
+    upper = [(x * 0.94, y * 0.94, top + 0.32) for x, y, _ in rings[-1]]
+    crown = [(x * 0.45, y * 0.45, top + 0.58) for x, y, _ in rings[-1]]
+    all_rings = rings + [rim, upper, crown]
+    rock_end = len(rings) - 1
+    half = len(rings) // 2
+    mb.loft(
+        all_rings,
+        lambda i, _j: under[0] if i < half else (under[1] if i < rock_end else top_color),
+        caps=(True, True),
+        smooth=False,
+    )
+    return top + 0.32
+
+
+def free_skies_sky_island(mb, hq):
+    """Complete 360-degree lush floating rock island for Free Skies dogfights."""
+    rng = random.Random(121)
+    sides = _q(hq, 16, 10)
+    rows = (
+        [(0.7, 0.0, 0.1), (3.2, 3.2, 0.4), (5.8, 6.2, 0.5), (8.2, 8.6, 0.4), (9.5, 10.6, 0.25)]
+        if hq
+        else [(0.9, 0.0, 0.05), (5.5, 5.2, 0.4), (9.4, 10.6, 0.2)]
+    )
+    top = _closed_rock_island(mb, rng, rows, sides, top_color="grass", under=("rock_dark", "rock"), lump=0.14)
+
+    # Cliff outcrops distributed all 360 degrees around the lower spire.
+    ribs = _q(hq, 6, 4)
+    for i in range(ribs):
+        a = 2 * math.pi * i / ribs + 0.25
+        z = rng.uniform(3.4, 6.8)
+        r = 2.8 + (z / 10.6) * 4.5
+        mb.sphere((r * math.cos(a), r * math.sin(a), z), (1.7, 1.7, 2.3), _q(hq, 6, 4), 2, "rock_dark", smooth=False)
+
+    # Perimeter boulders & full 360-degree canopy ring.
+    trees = _q(hq, 8, 4)
+    for i in range(trees):
+        a = 2 * math.pi * i / trees + rng.uniform(-0.18, 0.18)
+        r = rng.uniform(3.2, 6.4)
+        x, y, z = r * math.cos(a), r * math.sin(a), top + 0.1
+        mb.tube((x, y, z - 0.3), (x, y, z + 1.1), 0.22, sides=_q(hq, 4, 3), color="wood_dark")
+        with mb.xf(Matrix.Translation((x, y, z + 1.1))):
+            if hq:
+                mb.lathe([(1.45, 0), (0.8, 1.4), (0.1, 2.8)], 6, "grass_dark", smooth=False)
+            else:
+                mb.lathe([(1.45, 0), (0.1, 2.8)], 4, "grass_dark", smooth=False)
+    # Central cluster so the top center reads dense from every angle.
+    mb.tube((0.4, -0.5, top - 0.1), (0.4, -0.5, top + 1.5), 0.26, sides=_q(hq, 4, 3), color="wood_dark")
+    with mb.xf(Matrix.Translation((0.4, -0.5, top + 1.5))):
+        mb.lathe([(1.8, 0), (0.12, 3.2)], _q(hq, 6, 4), "grass_dark", smooth=False)
+
+    boulders = _q(hq, 6, 3)
+    for i in range(boulders):
+        a = 2 * math.pi * i / boulders + 0.4
+        r = rng.uniform(5.2, 7.6)
+        mb.sphere((r * math.cos(a), r * math.sin(a), top + 0.35), rng.uniform(0.7, 1.15), 5, 2, "rock", smooth=False)
+
+
+def free_skies_scrap_isle(mb, hq):
+    """Complete 360-degree salvage-yard rock island for Free Skies dogfights."""
+    rng = random.Random(144)
+    sides = _q(hq, 16, 10)
+    rows = (
+        [(0.9, 0.0, 0.15), (4.0, 3.5, 0.6), (7.8, 8.0, 0.6), (10.0, 10.6, 0.25)]
+        if hq
+        else [(1.1, 0.0, 0.05), (5.8, 5.4, 0.5), (10.0, 10.6, 0.2)]
+    )
+    top = _closed_rock_island(mb, rng, rows, sides, top_color="toxic_dark", under=("rust_dark", "rock_dark"), lump=0.18)
+
+    # Armored salvage plates jutting from all cliff flanks (360 degrees).
+    flanks = _q(hq, 6, 3)
+    for i in range(flanks):
+        a = 2 * math.pi * i / flanks
+        with mb.xf(Matrix.Translation((7.4 * math.cos(a), 7.4 * math.sin(a), 7.2)) @ Matrix.Rotation(a, 4, "Z") @ Matrix.Rotation(0.35, 4, "Y")):
+            mb.box((0, 0, 0), (1.2, 2.8, 3.4), "rust" if i % 2 == 0 else "iron")
+
+    # Wrecked hull ribs wedged cleanly into opposite sides of the plateau.
+    for sign in (1, -1):
+        with mb.xf(Matrix.Translation((sign * 4.2, sign * 1.4, top + 0.5)) @ Matrix.Rotation(sign * 0.45, 4, "Y") @ Matrix.Rotation(0.8 + (0 if sign > 0 else math.pi), 4, "Z")):
+            hull_rings = []
+            for y, w in ((-3.6, 0.3), (-1.8, 1.4), (1.4, 1.7), (3.6, 1.3)):
+                hull_rings.append([(-w, y, 0.2), (0, y, -0.7), (w, y, 0.2), (w, y, 1.8), (-w, y, 1.8)])
+            mb.loft(hull_rings, lambda i, j: "rust" if j % 2 else "wood_dark", caps=(True, True), smooth=False)
+
+    # Outward-facing shacks spaced cleanly all 360 degrees around.
+    shacks = _q(hq, 4, 2)
+    for i in range(shacks):
+        a = 2 * math.pi * i / shacks + 0.4
+        r = 6.2
+        _house(mb, r * math.cos(a), r * math.sin(a), top, 2.4, 1.9, 2.0, "rust_dark", "iron", lit=("ember" if hq else None), yaw=a + math.pi / 2)
+
+    # Central crane and perimeter boiler stacks.
+    mb.tube((0.0, 0.0, top), (0.0, 0.0, top + 7.6), 0.32, 0.2, sides=_q(hq, 6, 3), color="iron")
+    mb.tube((0.0, 0.0, top + 7.2), (4.6, 2.8, top + 8.6), 0.18, sides=_q(hq, 5, 3), color="rust")
+    stacks = _q(hq, 4, 2)
+    for i in range(stacks):
+        a = 2 * math.pi * i / stacks + 1.0
+        sx, sy = 4.6 * math.cos(a), 4.6 * math.sin(a)
+        mb.tube((sx, sy, top - 0.1), (sx, sy, top + 5.0), 0.48, 0.38, sides=_q(hq, 6, 4), color="iron")
+        mb.socket(f"smog_{i}", (sx, sy, top + 5.1))
+
+
+def free_skies_sky_vault(mb, hq):
+    """Complete 360-degree imperial sky-vault rock fortress for Free Skies dogfights."""
+    rng = random.Random(130)
+    sides = _q(hq, 16, 10)
+    rows = (
+        [(0.9, 0.0, 0.1), (5.0, 5.0, 0.4), (9.0, 9.5, 0.4), (11.0, 12.0, 0.25)]
+        if hq
+        else [(1.2, 0.0, 0.05), (7.0, 6.5, 0.45), (11.0, 12.0, 0.2)]
+    )
+    top = _closed_rock_island(mb, rng, rows, sides, top_color="enamel", under=("rock_dark", "rock"), lump=0.12)
+
+    # Central gilded dome temple.
+    with mb.xf(Matrix.Translation((0, 0, top + 0.1))):
+        mb.lathe([(8.0, 0.0), (8.0, 1.0), (6.4, 1.2), (6.4, 5.2), (4.8, 6.2), (2.2, 8.0), (0.3, 9.0)], _q(hq, 16, 8), lambda i, _j: ("enamel", "gold_dark", "faction_a", "gold_dark", "gold", "gold")[i], smooth=False)
+
+    # Full 360-degree colonnade around the drum.
+    col_count = _q(hq, 12, 6)
+    for i in range(col_count):
+        a = 2 * math.pi * i / col_count
+        mb.tube((7.0 * math.cos(a), 7.0 * math.sin(a), top + 1.1), (7.0 * math.cos(a), 7.0 * math.sin(a), top + 5.4), 0.34, sides=5, color="enamel")
+
+    # Grand vault doors on all 4 sides (360-degree symmetry).
+    for i in range(4):
+        a = math.pi * 0.5 * i
+        dx, dy = 6.5 * math.cos(a), 6.5 * math.sin(a)
+        with mb.xf(Matrix.Translation((dx, dy, top + 3.2)) @ Matrix.Rotation(a + math.pi / 2, 4, "Z") @ Matrix.Rotation(math.pi / 2, 4, "X")):
+            mb.lathe([(2.2, -0.3), (2.2, 0.3), (1.65, 0.45), (0.45, 0.5)], _q(hq, 10, 6), lambda k, _j: "gold" if k != 1 else "iron", smooth=False)
+
+    # 4 corner beacon spires around the perimeter.
+    for i in range(4):
+        a = math.pi * 0.25 + math.pi * 0.5 * i
+        bx, by = 8.4 * math.cos(a), 8.4 * math.sin(a)
+        with mb.xf(Matrix.Translation((bx, by, top))):
+            mb.lathe([(1.15, 0.0), (0.95, 5.4), (1.45, 5.8), (0.14, 8.5)], _q(hq, 8, 4), lambda k, _j: "gold" if k == 2 else "enamel", smooth=False)
+        mb.sphere((bx, by, top + 8.8), 0.5, _q(hq, 6, 4), 3, "liftstone", smooth=False)
+
+
+def free_skies_lift_mine(mb, hq):
+    """Complete 360-degree Lift-Stone quarry rock island for Free Skies dogfights."""
+    rng = random.Random(161)
+    sides = _q(hq, 16, 10)
+    rows = (
+        [(1.2, 0.0, 0.15), (5.0, 5.0, 0.6), (7.5, 9.5, 0.4), (8.2, 11.5, 0.25)]
+        if hq
+        else [(1.4, 0.0, 0.05), (6.0, 6.0, 0.5), (8.2, 11.5, 0.2)]
+    )
+    top = _closed_rock_island(mb, rng, rows, sides, top_color="rock", under=("rock_dark", "liftstone_dark"), lump=0.16)
+
+    # Glowing Lift-Stone crystals projecting out all 360 degrees around the rock wall.
+    crystals = _q(hq, 12, 6)
+    for i in range(crystals):
+        a = 2 * math.pi * i / crystals + rng.uniform(-0.15, 0.15)
+        z = 2.5 + ((i * 3) % 6) * 1.15
+        r = 2.1 + z * 0.62
+        x, y = r * math.cos(a), r * math.sin(a)
+        with mb.xf(Matrix.Translation((x, y, z)) @ Matrix.Rotation(a, 4, "Z") @ Matrix.Rotation(1.15, 4, "Y")):
+            s = rng.uniform(0.65, 1.15)
+            mb.lathe([(s * 0.5, -0.5), (s * 0.55, s * 0.6), (s * 0.08, s * 1.5)], _q(hq, 5, 3), "liftstone", smooth=False)
+
+    # Central pit headframe with hoist wheel.
+    for x, y in ((-1.7, -1.7), (1.7, -1.7), (-1.7, 1.7), (1.7, 1.7)):
+        mb.tube((x, y, top - 0.1), (x * 0.25, y * 0.25, top + 6.5), 0.2, sides=_q(hq, 4, 3), color="wood_dark")
+    mb.box((0, 0, top + 6.4), (1.6, 1.6, 0.3), "wood_mid")
+    with mb.xf(Matrix.Translation((0, 0, top + 6.8)) @ Matrix.Rotation(math.pi / 2, 4, "X")):
+        mb.lathe([(1.1, -0.14), (1.1, 0.14)], _q(hq, 10, 6), "iron_light", smooth=False)
+
+    # Symmetrical cliffside timber scaffold docks around 360 degrees.
+    docks = _q(hq, 4, 2)
+    for i in range(docks):
+        a = 2 * math.pi * i / docks + 0.5
+        dx, dy = 6.2 * math.cos(a), 6.2 * math.sin(a)
+        with mb.xf(Matrix.Translation((dx, dy, top)) @ Matrix.Rotation(a + math.pi / 2, 4, "Z")):
+            for px in (-1.4, 1.4):
+                mb.tube((px, -0.4, -5.0), (px, -0.4, 0.9), 0.14, sides=_q(hq, 4, 3), color="wood_dark")
+            mb.box((0, -0.4, 0.9), (3.4, 2.0, 0.22), "wood_mid")
+            _house(mb, 0, 0.4, 0.0, 2.2, 1.7, 1.9, "wood_mid", "iron", lit="lamp" if hq else None)

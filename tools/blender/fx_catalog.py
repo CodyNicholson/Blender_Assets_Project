@@ -62,6 +62,10 @@ PRESETS = {
     "BladeClash": {"flipbook": "Sparks", "sockets": ["trail_tip", "centre_stage"], "size_m": 1.1, "lifetime_s": 0.5, "rate": 0, "burst": 1, "max_particles": {"HQ": 2, "LQ": 1}, "velocity_mps": [0, 0, 0], "used_for": "Block, and duels in the arenas"},
     "WinchSparks": {"flipbook": "Sparks", "sockets": ["winch", "hook_tether_*", "rope"], "size_m": 1.6, "lifetime_s": 0.5, "rate": 6, "max_particles": {"HQ": 4, "LQ": 1}, "velocity_mps": [0, 0, 0], "used_for": "Krag's winch reeling you in"},
     "EmberDrift": {"flipbook": "Ember", "sockets": ["fire_*", "rupture_*", "fire"], "size_m": 0.22, "lifetime_s": 2.2, "rate": 7, "max_particles": {"HQ": 14, "LQ": 0}, "velocity_mps": [0, 1.6, 0], "used_for": "Drifts off every fire; rupture sockets in the Lift-Core chamber"},
+    # Ship-specific dogfight weapons (dogfight-weapons-plan.md in the Unity project).
+    "PlasmaCharge": {"flipbook": "Sparks", "sockets": ["siege_muzzle", "muzzle_F0"], "size_m": 3.0, "lifetime_s": 1.0, "rate": 0, "burst": 1, "max_particles": {"HQ": 1, "LQ": 1}, "velocity_mps": [0, 0, 0], "attached": True, "used_for": "The Plasma Lance gathering its charge at the bow for one second before it fires"},
+    "LightningOrbHit": {"flipbook": "LightningFlash", "sockets": ["hit_point"], "size_m": 9.0, "lifetime_s": 0.17, "rate": 0, "burst": 1, "max_particles": {"HQ": 2, "LQ": 1}, "velocity_mps": [0, 0, 0], "follow_up": "HullImpact", "used_for": "A ball of lightning bursting on the ship it shocks"},
+    "PlatingShatter": {"depth_test": False, "flipbook": "Sparks", "sockets": ["deck_centre", "lift_core"], "size_m": 16.0, "lifetime_s": 0.5, "rate": 0, "burst": 1, "max_particles": {"HQ": 3, "LQ": 1}, "velocity_mps": [0, 1.2, 0], "follow_up": "ShipShockwave", "used_for": "The steel Sovereign Gale's plating shattering in Ship-Hopping"},
     "RainSheet": {"flipbook": "Rain", "sockets": ["camera"], "size_m": 0, "lifetime_s": 0, "rate": 0, "max_particles": {"HQ": 1, "LQ": 1}, "velocity_mps": [0, 0, 0], "used_for": "Full-screen quad, scrolled down, over Act IV and the upper-deck brawl"},
 }
 
@@ -182,7 +186,10 @@ MODEL_ICONS = {
 
 # Icons drawn as vector glyphs, grouped by how the game uses them.
 GLYPH_ICONS = (
-    "Hud_FireBroadside", "Hud_Grapple", "Hud_Board", "Hud_Defend", "Hud_Repair",
+    "Hud_FireBroadside", "Hud_Grapple",
+    # Fire buttons for the ships with weapons of their own (dogfight-weapons-plan.md in the Unity project).
+    "Hud_FireGun", "Hud_FireLightning", "Hud_FireSunbeam", "Hud_FirePlasma", "Hud_FireStarlight",
+    "Hud_FireFireball", "Hud_FireTurrets", "Hud_FireTidal", "Hud_FireBoulder", "Hud_Board", "Hud_Defend", "Hud_Repair",
     "Hud_AltitudeUp", "Hud_AltitudeDown", "Hud_ThrottleUp", "Hud_ThrottleDown",
     "Hud_Hull", "Hud_Crew", "Hud_Comms", "Hud_Timer", "Hud_Map", "Hud_Pause", "Hud_Settings", "Hud_Close", "Hud_Back", "Hud_Locked",
     "Target_Engine", "Target_Guns", "Target_Sails", "Target_Envelope", "Target_LiftCore", "Target_Reticle",
@@ -203,4 +210,5 @@ GLYPH_ICONS = (
     "Skill_Gunslinger", "Skill_HiddenCannon", "Skill_Mutiny",
     "Skill_Concoction", "Skill_PoisonSmog", "Skill_Massacure",
     "Skill_ChopJab", "Skill_Javelin", "Skill_Helicopter",
+    "Skill_Impale", "Skill_Counter", "Skill_Flurry",
 )

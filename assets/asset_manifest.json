@@ -1075,6 +1075,72 @@
       ],
       "used_for": "Drifts off every fire; rupture sockets in the Lift-Core chamber"
     },
+    "PlasmaCharge": {
+      "flipbook": "Sparks",
+      "sockets": [
+        "siege_muzzle",
+        "muzzle_F0"
+      ],
+      "size_m": 3.0,
+      "lifetime_s": 1.0,
+      "rate": 0,
+      "burst": 1,
+      "max_particles": {
+        "HQ": 1,
+        "LQ": 1
+      },
+      "velocity_mps": [
+        0,
+        0,
+        0
+      ],
+      "attached": true,
+      "used_for": "The Plasma Lance gathering its charge at the bow for one second before it fires"
+    },
+    "LightningOrbHit": {
+      "flipbook": "LightningFlash",
+      "sockets": [
+        "hit_point"
+      ],
+      "size_m": 9.0,
+      "lifetime_s": 0.17,
+      "rate": 0,
+      "burst": 1,
+      "max_particles": {
+        "HQ": 2,
+        "LQ": 1
+      },
+      "velocity_mps": [
+        0,
+        0,
+        0
+      ],
+      "follow_up": "HullImpact",
+      "used_for": "A ball of lightning bursting on the ship it shocks"
+    },
+    "PlatingShatter": {
+      "depth_test": false,
+      "flipbook": "Sparks",
+      "sockets": [
+        "deck_centre",
+        "lift_core"
+      ],
+      "size_m": 16.0,
+      "lifetime_s": 0.5,
+      "rate": 0,
+      "burst": 1,
+      "max_particles": {
+        "HQ": 3,
+        "LQ": 1
+      },
+      "velocity_mps": [
+        0,
+        1.2,
+        0
+      ],
+      "follow_up": "ShipShockwave",
+      "used_for": "The steel Sovereign Gale's plating shattering in Ship-Hopping"
+    },
     "RainSheet": {
       "flipbook": "Rain",
       "sockets": [
@@ -1754,6 +1820,19 @@
         }
       }
     },
+    "Hud_FireBoulder": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireBoulder_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireBoulder_LQ.png",
+          "size": 128
+        }
+      }
+    },
     "Hud_FireBroadside": {
       "source_model": null,
       "variants": {
@@ -1763,6 +1842,110 @@
         },
         "LQ": {
           "file": "T_Icon_Hud_FireBroadside_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Hud_FireFireball": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireFireball_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireFireball_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Hud_FireGun": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireGun_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireGun_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Hud_FireLightning": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireLightning_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireLightning_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Hud_FirePlasma": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FirePlasma_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FirePlasma_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Hud_FireStarlight": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireStarlight_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireStarlight_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Hud_FireSunbeam": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireSunbeam_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireSunbeam_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Hud_FireTidal": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireTidal_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireTidal_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Hud_FireTurrets": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireTurrets_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireTurrets_LQ.png",
           "size": 128
         }
       }
@@ -2872,6 +3055,19 @@
         }
       }
     },
+    "Skill_Counter": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Skill_Counter_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Skill_Counter_LQ.png",
+          "size": 128
+        }
+      }
+    },
     "Skill_CrushingBlow": {
       "source_model": null,
       "variants": {
@@ -2963,6 +3159,19 @@
         }
       }
     },
+    "Skill_Flurry": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Skill_Flurry_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Skill_Flurry_LQ.png",
+          "size": 128
+        }
+      }
+    },
     "Skill_GaleSlash": {
       "source_model": null,
       "variants": {
@@ -3050,6 +3259,19 @@
         },
         "LQ": {
           "file": "T_Icon_Skill_HookSwing_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Skill_Impale": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Skill_Impale_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Skill_Impale_LQ.png",
           "size": 128
         }
       }
@@ -9495,6 +9717,11 @@
             3.1,
             -2.8018
           ],
+          "coil_tip": [
+            0.0003,
+            6.75,
+            1.8182
+          ],
           "deck_centre": [
             0.0003,
             3.1,
@@ -9601,6 +9828,11 @@
             -2.5927,
             3.1,
             -2.8018
+          ],
+          "coil_tip": [
+            0.0073,
+            6.75,
+            1.8182
           ],
           "deck_centre": [
             0.0073,
@@ -10859,6 +11091,11 @@
             2.7581,
             -1.2
           ],
+          "bomb_bay": [
+            0.0,
+            -0.0419,
+            -1.2
+          ],
           "deck_centre": [
             0.0,
             2.7581,
@@ -10964,6 +11201,11 @@
           "boarding_R": [
             -7.82,
             2.7581,
+            -1.412
+          ],
+          "bomb_bay": [
+            0.0,
+            -0.0419,
             -1.412
           ],
           "deck_centre": [
@@ -11148,6 +11390,31 @@
             2.0,
             -4.4893
           ],
+          "muzzle_X0": [
+            7.348,
+            4.358,
+            -1.7293
+          ],
+          "muzzle_X1": [
+            7.348,
+            0.422,
+            -1.7293
+          ],
+          "muzzle_X2": [
+            -7.352,
+            4.358,
+            -1.7293
+          ],
+          "muzzle_X3": [
+            -7.352,
+            0.422,
+            -1.7293
+          ],
+          "orb_muzzle": [
+            -0.002,
+            2.05,
+            10.4907
+          ],
           "propeller_L0": [
             2.798,
             2.1,
@@ -11244,6 +11511,31 @@
             -2.9136,
             2.0,
             -4.4878
+          ],
+          "muzzle_X0": [
+            7.3544,
+            4.358,
+            -1.7278
+          ],
+          "muzzle_X1": [
+            7.3544,
+            0.422,
+            -1.7278
+          ],
+          "muzzle_X2": [
+            -7.3456,
+            4.358,
+            -1.7278
+          ],
+          "muzzle_X3": [
+            -7.3456,
+            0.422,
+            -1.7278
+          ],
+          "orb_muzzle": [
+            0.0044,
+            2.05,
+            10.4922
           ],
           "propeller_L0": [
             2.8044,
@@ -11879,6 +12171,11 @@
             -0.0007,
             5.6,
             -7.0021
+          ],
+          "sun_core": [
+            -0.0007,
+            10.0,
+            0.8979
           ]
         },
         "LQ": {
@@ -11976,6 +12273,11 @@
             0.0065,
             5.6,
             -6.9722
+          ],
+          "sun_core": [
+            0.0065,
+            10.0,
+            0.9278
           ]
         }
       },
@@ -13538,6 +13840,11 @@
             2.98,
             -5.0846
           ],
+          "orb_front": [
+            0.0,
+            10.98,
+            0.6454
+          ],
           "propeller_L0": [
             4.2,
             2.78,
@@ -13634,6 +13941,11 @@
             -4.0062,
             2.98,
             -5.0846
+          ],
+          "orb_front": [
+            0.0458,
+            10.98,
+            0.6454
           ],
           "propeller_L0": [
             4.2458,
@@ -15753,6 +16065,16 @@
             5.65,
             5.41
           ],
+          "siege_muzzle_0": [
+            0.0,
+            5.65,
+            5.41
+          ],
+          "siege_muzzle_1": [
+            0.0,
+            5.65,
+            0.55
+          ],
           "smoke_vent": [
             0.0,
             5.8,
@@ -15854,6 +16176,16 @@
             0.0592,
             5.65,
             5.41
+          ],
+          "siege_muzzle_0": [
+            0.0592,
+            5.65,
+            5.41
+          ],
+          "siege_muzzle_1": [
+            0.0592,
+            5.65,
+            0.55
           ],
           "smoke_vent": [
             0.0592,
@@ -16539,6 +16871,152 @@
       },
       "default_faction": "Gilded"
     },
+    "SM_Prop_SkullTorpedo": {
+      "variants": {
+        "HQ": {
+          "tier": "prop",
+          "tris": 696
+        },
+        "LQ": {
+          "tier": "prop_low",
+          "tris": 248
+        }
+      },
+      "sockets": {
+        "HQ": {
+          "exhaust": [
+            0.0,
+            -0.02,
+            -0.0
+          ],
+          "tip": [
+            0.0,
+            1.34,
+            -0.0
+          ]
+        },
+        "LQ": {
+          "exhaust": [
+            0.065,
+            -0.02,
+            -0.0
+          ],
+          "tip": [
+            0.065,
+            1.34,
+            -0.0
+          ]
+        }
+      },
+      "default_faction": "Sorcerer"
+    },
+    "SM_Prop_AtomBomb": {
+      "variants": {
+        "HQ": {
+          "tier": "prop",
+          "tris": 252
+        },
+        "LQ": {
+          "tier": "prop_low",
+          "tris": 128
+        }
+      },
+      "sockets": {
+        "HQ": {
+          "tip": [
+            0.0,
+            1.14,
+            -0.0
+          ]
+        },
+        "LQ": {
+          "tip": [
+            0.0,
+            1.14,
+            -0.0
+          ]
+        }
+      },
+      "default_faction": "Sorcerer"
+    },
+    "SM_Prop_DragonBody": {
+      "variants": {
+        "HQ": {
+          "tier": "prop",
+          "tris": 456
+        },
+        "LQ": {
+          "tier": "prop_low",
+          "tris": 208
+        }
+      },
+      "sockets": {
+        "HQ": {
+          "mouth": [
+            0.0,
+            1.805,
+            5.0786
+          ],
+          "wing_L": [
+            0.55,
+            1.305,
+            1.7786
+          ],
+          "wing_R": [
+            -0.55,
+            1.305,
+            1.7786
+          ]
+        },
+        "LQ": {
+          "mouth": [
+            0.0,
+            1.8001,
+            5.0786
+          ],
+          "wing_L": [
+            0.55,
+            1.3001,
+            1.7786
+          ],
+          "wing_R": [
+            -0.55,
+            1.3001,
+            1.7786
+          ]
+        }
+      },
+      "default_faction": "Crimson"
+    },
+    "SM_Prop_DragonWing": {
+      "variants": {
+        "HQ": {
+          "tier": "prop",
+          "tris": 108
+        },
+        "LQ": {
+          "tier": "prop_low",
+          "tris": 44
+        }
+      },
+      "sockets": {
+        "HQ": {
+          "root": [
+            -2.3971,
+            0.0841,
+            0.2753
+          ]
+        },
+        "LQ": {
+          "root": [
+            -2.398,
+            0.0739,
+            0.375
+          ]
+        }
+      },
+      "default_faction": "Crimson"
+    },
     "SM_Prop_LiftCore": {
       "variants": {
         "HQ": {
@@ -16618,6 +17096,22 @@
         "LQ": {
           "tier": "prop_low",
           "tris": 52
+        }
+      },
+      "sockets": {
+        "HQ": {},
+        "LQ": {}
+      }
+    },
+    "SM_Prop_Boulder": {
+      "variants": {
+        "HQ": {
+          "tier": "prop",
+          "tris": 174
+        },
+        "LQ": {
+          "tier": "prop_low",
+          "tris": 64
         }
       },
       "sockets": {
@@ -20512,6 +21006,103 @@
         }
       },
       "default_faction": "Gilded"
+    },
+    "SM_Env_FreeSkiesSkyIsland": {
+      "variants": {
+        "HQ": {
+          "tier": "environment",
+          "tris": 852
+        },
+        "LQ": {
+          "tier": "environment_low",
+          "tris": 312
+        }
+      },
+      "sockets": {
+        "HQ": {},
+        "LQ": {}
+      }
+    },
+    "SM_Env_FreeSkiesScrapIsle": {
+      "variants": {
+        "HQ": {
+          "tier": "environment",
+          "tris": 624
+        },
+        "LQ": {
+          "tier": "environment_low",
+          "tris": 312
+        }
+      },
+      "sockets": {
+        "HQ": {
+          "smog_0": [
+            1.6551,
+            16.02,
+            -2.8786
+          ],
+          "smog_1": [
+            -4.701,
+            16.02,
+            -1.4932
+          ],
+          "smog_2": [
+            -3.3156,
+            16.02,
+            4.8629
+          ],
+          "smog_3": [
+            3.0405,
+            16.02,
+            3.4775
+          ]
+        },
+        "LQ": {
+          "smog_0": [
+            1.4671,
+            16.02,
+            -3.4815
+          ],
+          "smog_1": [
+            -3.5037,
+            16.02,
+            4.2601
+          ]
+        }
+      }
+    },
+    "SM_Env_FreeSkiesSkyVault": {
+      "variants": {
+        "HQ": {
+          "tier": "environment",
+          "tris": 1304
+        },
+        "LQ": {
+          "tier": "environment_low",
+          "tris": 688
+        }
+      },
+      "sockets": {
+        "HQ": {},
+        "LQ": {}
+      },
+      "default_faction": "Gilded"
+    },
+    "SM_Env_FreeSkiesLiftMine": {
+      "variants": {
+        "HQ": {
+          "tier": "environment",
+          "tris": 916
+        },
+        "LQ": {
+          "tier": "environment_low",
+          "tris": 368
+        }
+      },
+      "sockets": {
+        "HQ": {},
+        "LQ": {}
+      }
     },
     "SK_PirateCaptain": {
       "variants": {

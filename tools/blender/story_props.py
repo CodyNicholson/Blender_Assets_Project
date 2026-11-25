@@ -144,6 +144,105 @@ def missile(mb, hq):
     mb.socket("tip", (0, 0, 1.3))
 
 
+def skull_torpedo(mb, hq):
+    """The Bone Revenant's torpedo: an all-black hull painted with white skulls, to match the bone-and-abyss ship that
+    fires it. Same length and layout as the missile (flies nose-first along +Z, thruster VFX at 'exhaust')."""
+    sides = _q(hq, 10, 6)
+    r = 0.15
+    profile = [(0.07, 0.0), (0.12, 0.08), (r, 0.22), (r, 0.92), (0.12, 1.12), (0.06, 1.24), (0.01, 1.3)] if hq \
+        else [(0.08, 0.0), (r, 0.2), (r, 0.95), (0.01, 1.3)]
+    mb.lathe(profile, sides, "eye_dark", smooth=False)
+    fins = _q(hq, 4, 3)
+    for i in range(fins):
+        with mb.xf(Matrix.Rotation(2 * math.pi * (i + 0.5) / fins, 4, "Z")):
+            mb.plate([(0.12, 0, 0.36), (0.32, 0, 0.02), (0.32, 0, -0.04), (0.1, 0, 0.1)], 0.015, "eye_dark")
+    # Big white skulls around the hull, each facing out: cranium, black eye sockets (and nose on HQ), square jaw.
+    # Three or more, so one always shows whichever way the torpedo rolls in flight.
+    skulls = _q(hq, 4, 3)
+    z = 0.62
+    for i in range(skulls):
+        with mb.xf(Matrix.Rotation(2 * math.pi * i / skulls, 4, "Z")):
+            mb.sphere((r - 0.01, 0, z + 0.03), (0.045, 0.1, 0.095), _q(hq, 7, 4), _q(hq, 4, 3), "cloth_white", smooth=False)
+            mb.box((r + 0.004, 0, z - 0.075), (0.06, 0.09, 0.065), "cloth_white", top_scale=1.1)
+            for sign in (1, -1):
+                if hq:
+                    mb.sphere((r + 0.03, sign * 0.038, z + 0.025), (0.014, 0.026, 0.028), 5, 3, "eye_dark", smooth=False)
+                else:
+                    mb.box((r + 0.028, sign * 0.038, z + 0.025), (0.024, 0.044, 0.044), "eye_dark")
+            if hq:
+                mb.box((r + 0.032, 0, z - 0.024), (0.014, 0.022, 0.026), "eye_dark", top_scale=0.3)
+    mb.socket("exhaust", (0, 0, -0.06))
+    mb.socket("tip", (0, 0, 1.3))
+
+
+def atom_bomb(mb, hq):
+    """The Nebula Saucer's ATOM BOMB: a fat olive casing with a yellow hazard band, a dark nose and a boxed tail.
+    Like the missile, its nose is along +Z, so the game can point it along its fall."""
+    sides = _q(hq, 10, 6)
+    profile = [(0.07, 0.0), (0.16, 0.28), (0.27, 0.42), (0.32, 0.6), (0.32, 0.78), (0.3, 0.88), (0.22, 1.02), (0.01, 1.12)] if hq \
+        else [(0.08, 0.0), (0.27, 0.42), (0.32, 0.8), (0.18, 1.02), (0.01, 1.12)]
+    band = (4,) if hq else (2,)
+    nose = len(profile) - 2
+    mb.lathe(profile, sides, lambda i, _j: "gold" if i in band else "iron" if i >= nose else "toxic", smooth=False)
+    # Boxed tail: four fins inside a square frame.
+    for i in range(_q(hq, 4, 2)):
+        with mb.xf(Matrix.Rotation(math.pi * 0.5 * i, 4, "Z")):
+            mb.plate([(0.06, 0, 0.36), (0.24, 0, 0.02), (0.24, 0, -0.02), (0.06, 0, 0.1)], 0.02, "iron")
+    for i in range(4):
+        with mb.xf(Matrix.Rotation(math.pi * 0.5 * i, 4, "Z")):
+            mb.box((0.24, 0, 0.08), (0.03, 0.5, 0.2), "gold" if hq else "iron")
+    mb.socket("tip", (0, 0, 1.12))
+
+
+def dragon_body(mb, hq):
+    """The Dragon Ship's summoned red dragon, without its wings (SM_Prop_DragonWing, flapped by the game at the
+    wing_L / wing_R sockets). Faces -Y like the ships; fire pours from the 'mouth' socket."""
+    sides = _q(hq, 10, 6)
+    # Body, chest to hips, with a gold belly underneath.
+    mb.path([(0, -1.3, 0.55), (0, -0.4, 0.6), (0, 0.6, 0.55), (0, 1.5, 0.5)], [0.6, 0.75, 0.68, 0.45], sides, "faction_a")
+    mb.box((0, 0.0, 0.08), (0.7, 2.4, 0.24), "gold_dark", top_scale=0.8)
+    # Neck rising to a horned head with glowing eyes.
+    mb.path([(0, -1.4, 0.75), (0, -2.1, 1.25), (0, -2.6, 1.6)], [0.42, 0.32, 0.26], _q(hq, 8, 4), "faction_a")
+    mb.box((0, -2.9, 1.65), (0.6, 0.75, 0.48), "faction_a", top_scale=0.8)
+    mb.box((0, -3.5, 1.55), (0.42, 0.7, 0.3), "faction_a", top_scale=0.75)
+    mb.box((0, -3.4, 1.33), (0.36, 0.7, 0.14), "faction_c")
+    for sign in (1, -1):
+        mb.tube((sign * 0.2, -2.75, 1.85), (sign * 0.42, -2.2, 2.35), 0.09, 0.0, sides=_q(hq, 5, 3), color="enamel")
+        if hq:
+            mb.sphere((sign * 0.24, -3.08, 1.74), 0.07, 5, 3, "ember", smooth=False)
+        else:
+            mb.box((sign * 0.24, -3.08, 1.74), (0.1, 0.1, 0.1), "ember")
+    # A long tail ending in a spade.
+    mb.path([(0, 1.4, 0.5), (0, 2.8, 0.35), (0, 4.2, 0.55), (0, 5.4, 0.95)], [0.42, 0.28, 0.15, 0.05], _q(hq, 6, 4), "faction_a")
+    mb.plate([(0, 5.2, 0.9), (0.35, 5.6, 1.0), (0, 6.2, 1.15), (-0.35, 5.6, 1.0)], 0.06, "faction_c")
+    if hq:
+        # Spines down the back.
+        for i, y in enumerate((-2.2, -1.3, -0.5, 0.3, 1.1, 2.0, 2.9)):
+            z = 1.4 if y < -1.8 else 1.25 if y < 1.6 else 0.75
+            mb.tube((0, y, z - 0.15), (0, y + 0.25, z + 0.22), 0.1, 0.0, sides=4, color="enamel")
+    # Legs tucked up under the body in flight.
+    for sign in (1, -1):
+        for y in _q(hq, (-0.9, 1.0), (0.0,)):
+            mb.tube((sign * 0.45, y, 0.3), (sign * 0.55, y + 0.45, -0.25), 0.16, 0.09, sides=_q(hq, 5, 3), color="faction_a")
+    mb.socket("wing_L", (0.55, -0.6, 1.0))
+    mb.socket("wing_R", (-0.55, -0.6, 1.0))
+    mb.socket("mouth", (0, -3.9, 1.5))
+
+
+def dragon_wing(mb, hq):
+    """One wing of the summoned dragon, root at 'root', reaching out along +X. The game mirrors it for the other side
+    and flaps both about their roots."""
+    outline = [(0, -0.35, 0), (1.4, -0.75, 0), (2.6, -0.65, 0), (4.8, 0.2, 0), (3.7, 1.0, 0), (2.5, 1.5, 0), (1.3, 1.3, 0), (0, 0.85, 0)]
+    mb.plate(outline, 0.05, "faction_c")
+    mb.tube((0, -0.35, 0.03), (2.6, -0.65, 0.05), 0.12, 0.07, sides=_q(hq, 5, 3), color="faction_a")
+    mb.tube((2.6, -0.65, 0.05), (4.8, 0.2, 0.04), 0.07, 0.02, sides=_q(hq, 5, 3), color="faction_a")
+    if hq:
+        for tip in ((3.7, 1.0, 0.03), (2.5, 1.5, 0.03), (1.3, 1.3, 0.03)):
+            mb.tube((2.6, -0.65, 0.05), tip, 0.05, 0.015, sides=4, color="faction_a")
+        mb.tube((2.6, -0.65, 0.05), (2.85, -0.95, 0.06), 0.06, 0.0, sides=4, color="enamel")
+    mb.socket("root", (0, 0, 0))
+
+
 def lift_core(mb, hq):
     """The heart of every airship and a sub-system target. Morrow sabotages this one."""
     sides = _q(hq, 12, 6)
@@ -190,6 +289,29 @@ def ammo_fire_shot(mb, hq):
     mb.tube((0, 0, 0.35), (0, 0.02, 0.47), 0.018, sides=_q(hq, 5, 3), color="rope")
     if hq:
         mb.sphere((0, 0.02, 0.49), 0.035, 5, 3, "ember", smooth=False)
+
+
+def ammo_boulder(mb, hq):
+    """The Earthshaker's thrown rock: a craggy basalt boulder with a Lift-Stone shard still stuck in it, so it reads
+    at distance. The game spins it as it arcs through the air."""
+    rng = random.Random(31)
+    sides = _q(hq, 9, 6)
+    profile = ((0.08, 0.0), (0.22, 0.05), (0.3, 0.16), (0.32, 0.3), (0.27, 0.44), (0.14, 0.54), (0.03, 0.58)) if hq \
+        else ((0.1, 0.0), (0.3, 0.14), (0.3, 0.38), (0.12, 0.56))
+    rings = []
+    for radius, z in profile:
+        ring = []
+        for j in range(sides):
+            a = 2 * math.pi * j / sides
+            r = radius * (1 + rng.uniform(-0.16, 0.16))
+            ring.append((r * math.cos(a), r * math.sin(a), z + rng.uniform(-0.025, 0.025)))
+        rings.append(ring)
+    half = len(rings) // 2
+    mb.loft(rings, lambda i, j: "rock_dark" if i < half or (i + j) % 5 == 0 else "rock", smooth=False)
+    shards = ((0.22, -0.08, 0.36, 0.4, 0.5), (-0.16, 0.18, 0.42, -0.35, 0.6)) if hq else ((0.22, -0.08, 0.36, 0.4, 0.5),)
+    for x, y, z, tilt_x, tilt_y in shards:
+        with mb.xf(Matrix.Translation((x, y, z)) @ Matrix.Rotation(tilt_x, 4, "X") @ Matrix.Rotation(tilt_y, 4, "Y")):
+            mb.lathe([(0.045, -0.05), (0.05, 0.08), (0.0, 0.17)], _q(hq, 5, 4), "liftstone", smooth=False)
 
 
 def ammo_grapeshot(mb, hq):

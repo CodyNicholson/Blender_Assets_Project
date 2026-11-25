@@ -86,6 +86,7 @@ SKILL_MEDALS = {
     "Skill_Gunslinger": SKILL_PHYSICAL, "Skill_HiddenCannon": SKILL_PHYSICAL, "Skill_Mutiny": SKILL_PHYSICAL,
     "Skill_Concoction": SKILL_HEAL, "Skill_PoisonSmog": SKILL_MAGIC, "Skill_Massacure": SKILL_PHYSICAL,
     "Skill_ChopJab": SKILL_PHYSICAL, "Skill_Javelin": SKILL_PHYSICAL, "Skill_Helicopter": SKILL_PHYSICAL,
+    "Skill_Impale": SKILL_PHYSICAL, "Skill_Counter": SKILL_PHYSICAL, "Skill_Flurry": SKILL_PHYSICAL,
 }
 MEDALS.update(SKILL_MEDALS)
 
@@ -234,6 +235,28 @@ def _swirl(g, offset=0.0):
 
 def _crystal(g, s=1.0, cy=0.0):
     return g.poly((0, 0.86 * s + cy), (0.42 * s, 0.32 * s + cy), (0.3 * s, -0.5 * s + cy), (0, -0.84 * s + cy), (-0.3 * s, -0.5 * s + cy), (-0.42 * s, 0.32 * s + cy))
+
+
+def _lance(g, ax, ay, bx, by, pennant=True):
+    """Roxanne's corsair lance (SM_Prop_CorsairLance) from its butt at a to its point at b: dark wood shaft,
+    brass vamplate guard, silver head with a violet fuller and a cyan pennant. Layers, back to front."""
+    length = float(np.hypot(bx - ax, by - ay))
+    dx, dy = (bx - ax) / length, (by - ay) / length
+    nx, ny = -dy, dx
+
+    def at(t, side=0.0):
+        return (ax + dx * t + nx * side, ay + dy * t + ny * side)
+
+    head = length - 0.46
+    shaft = g.line(ax, ay, *at(head + 0.05), 0.055)
+    guard = g.poly(at(0.3, 0.06), at(0.3, -0.06), at(0.52, -0.2), at(0.52, 0.2))
+    point = g.poly(at(head, 0.07), at(head + 0.18, 0.15), at(length), at(head + 0.18, -0.15), at(head, -0.07))
+    fuller = g.line(*at(head + 0.06), *at(length - 0.1), 0.022)
+    layers = [(shaft, BROWN), (guard, GOLD), (point, WHITE), (fuller, VIOLET)]
+    if pennant:
+        flag = g.poly(at(head - 0.04, 0.04), at(head - 0.12, 0.3), at(head - 0.3, 0.04))
+        layers.insert(0, (flag, CYAN))
+    return layers
 
 
 def _skill_layers(name, g):
@@ -504,6 +527,25 @@ def _skill_layers(name, g):
         sparks = union(g.star(0.48, 0.56, 0.22, 0.08, 6), g.star(0.62, 0.38, 0.18, 0.06, 5), g.star(0.26, 0.65, 0.15, 0.05, 4))
         blood = union(g.poly((0.35, 0.35), (0.58, 0.48), (0.48, 0.58)), g.circle(0.42, 0.32, 0.08))
         return [(sparks, ORANGE), (engine, IRON), (bar, STEEL), (teeth, WHITE), (blood, RED)]
+    if name == "Skill_Impale":
+        # A leaping downward thrust: the lance drives into the target in a burst of impact.
+        burst = g.star(0.56, -0.56, 0.4, 0.15, 8, 0.2)
+        leap = union(g.line(-0.92, 0.12, -0.62, 0.42, 0.04), g.line(-0.12, 0.92, 0.18, 0.62, 0.04))
+        return [(leap, PALE), (burst, ORANGE), (g.star(0.56, -0.56, 0.2, 0.08, 8, 0.2), FLAME)] + _lance(g, -0.64, 0.64, 0.4, -0.4)
+    if name == "Skill_Counter":
+        # A braced spear stance: a guard arc turns the blow aside and an arrow swings back to strike.
+        guard = clip(g.ring(-0.05, -0.05, 0.74, 0.07), g.box(-0.52, -0.52, 0.5, 0.5))
+        back = clip(g.ring(0.1, 0.1, 0.62, 0.05), g.box(0.55, 0.1, 0.42, 0.42, rnd=0.0))
+        arrow = g.poly((0.52, 0.66), (0.84, 0.6), (0.62, 0.36))
+        clash = g.star(-0.56, -0.56, 0.24, 0.09, 6, 0.3)
+        return [(guard, CYAN), (union(back, arrow), ORANGE), (clash, SPARK)] + _lance(g, -0.72, -0.56, 0.66, 0.66, pennant=False)
+    if name == "Skill_Flurry":
+        # A storm of jabs: the lance and two echoes of its point stabbing out ahead of it.
+        echoes = union(g.poly((0.34, 0.62), (0.5, 0.74), (0.88, 0.6), (0.48, 0.5)),
+                       g.poly((0.36, -0.22), (0.52, -0.1), (0.9, -0.24), (0.5, -0.34)))
+        streaks = union(g.line(-0.36, 0.6, 0.26, 0.62, 0.04), g.line(-0.3, -0.24, 0.28, -0.22, 0.04))
+        sparks = union(g.star(0.94, 0.62, 0.13, 0.05, 4), g.star(0.96, -0.24, 0.13, 0.05, 4))
+        return [(streaks, CYAN), (echoes, PALE), (sparks, SPARK)] + _lance(g, -0.86, 0.12, 0.94, 0.2, pennant=False)
     if name == "Skill_ChopJab":
         shaft = g.line(-0.68, -0.58, 0.38, 0.48, 0.055)
         spear = g.poly((0.28, 0.38), (0.46, 0.56), (0.76, 0.78), (0.54, 0.48), (0.36, 0.3))
@@ -532,8 +574,77 @@ def _skill_layers(name, g):
     return None
 
 
+def _weapon_button_layers(name, g):
+    """The dogfight's red fire buttons for ships with weapons of their own (Ransom_Skies_Unity_Project
+    docs/dogfight-weapons-plan.md). White shapes with one colour accent, like Hud_FireBroadside. None for other names."""
+    if name == "Hud_FireGun":
+        # A rotary gun side on, three barrels spitting a stream of tracers to the right.
+        barrels = union(g.box(0.0, 0.22, 0.5, 0.07), g.box(0.0, 0.0, 0.5, 0.07), g.box(0.0, -0.22, 0.5, 0.07))
+        clamps = union(g.box(-0.32, 0.0, 0.06, 0.32), g.box(0.32, 0.0, 0.06, 0.32))
+        body = union(g.box(-0.62, 0.0, 0.24, 0.3, rnd=0.06), g.line(-0.7, -0.2, -0.84, -0.78, 0.1))
+        tracers = union(*(g.line(0.72 + 0.04 * k, 0.16 * (k - 1.5), 0.96, 0.3 * (k - 1.5), 0.035) for k in range(4)))
+        return [(tracers, SPARK), (g.star(0.58, 0.0, 0.34, 0.13, 8), ORANGE), (body, STEEL), (barrels, WHITE), (clamps, STEEL)]
+    if name == "Hud_FireLightning":
+        # A ball of lightning: a crackling sphere with bolts leaping off it.
+        arcs = union(
+            g.poly((0.36, 0.5), (0.7, 0.78), (0.58, 0.6), (0.86, 0.66), (0.5, 0.4)),
+            g.poly((-0.36, -0.5), (-0.7, -0.78), (-0.58, -0.6), (-0.86, -0.66), (-0.5, -0.4)),
+            g.poly((0.5, -0.32), (0.86, -0.4), (0.7, -0.26), (0.9, -0.12), (0.54, -0.16)),
+            g.poly((-0.5, 0.32), (-0.86, 0.4), (-0.7, 0.26), (-0.9, 0.12), (-0.54, 0.16)))
+        return [(arcs, CYAN), (g.circle(0, 0, 0.5), CYAN), (g.circle(0, 0, 0.36), WHITE), (_bolt(g, 0.32), CYAN)]
+    if name == "Hud_FireSunbeam":
+        # A sun on the left pouring a wide beam of light to the right.
+        beam = g.poly((-0.36, 0.2), (0.94, 0.36), (0.94, -0.36), (-0.36, -0.2))
+        core = g.poly((-0.36, 0.08), (0.94, 0.14), (0.94, -0.14), (-0.36, -0.08))
+        return [(beam, GOLD), (core, WHITE), (g.star(-0.48, 0.0, 0.5, 0.3, 10), GOLD), (g.circle(-0.48, 0.0, 0.26), WHITE)]
+    if name == "Hud_FirePlasma":
+        # One huge violet lance blasting out of a charged muzzle, bursting where it lands.
+        lance = g.box(0.0, 0.0, 0.62, 0.17, rnd=0.12)
+        core = g.box(0.0, 0.0, 0.56, 0.06, rnd=0.05)
+        muzzle = union(g.box(-0.74, 0.0, 0.16, 0.32, rnd=0.06), g.box(-0.56, 0.0, 0.06, 0.22))
+        return [(g.star(0.66, 0.0, 0.34, 0.16, 8), VIOLET), (lance, VIOLET), (core, WHITE), (muzzle, STEEL)]
+    if name == "Hud_FireStarlight":
+        # Three quick laser bolts streaking right, with a starburst where they left the bow.
+        bolts = union(g.box(0.1, 0.36, 0.34, 0.06, rnd=0.06), g.box(0.34, 0.0, 0.44, 0.07, rnd=0.07), g.box(0.1, -0.36, 0.34, 0.06, rnd=0.06))
+        cores = union(g.box(0.14, 0.36, 0.26, 0.022, rnd=0.02), g.box(0.38, 0.0, 0.36, 0.025, rnd=0.025), g.box(0.14, -0.36, 0.26, 0.022, rnd=0.02))
+        return [(bolts, CYAN), (cores, WHITE), (g.star(-0.58, 0.0, 0.34, 0.1, 4, 0.0), WHITE), (g.star(-0.58, 0.0, 0.18, 0.06, 4, 0.78), CYAN)]
+    if name == "Hud_FireFireball":
+        # Twin stubby deck mortars lobbing two fireballs up and to the right.
+        mortars = union(g.box(-0.56, -0.5, 0.12, 0.3, rot=-0.6, rnd=0.05), g.box(-0.16, -0.62, 0.12, 0.26, rot=-0.6, rnd=0.05))
+        bases = union(g.box(-0.62, -0.78, 0.2, 0.08), g.box(-0.22, -0.86, 0.2, 0.08))
+        trail = union(g.poly((0.18, 0.44), (-0.4, -0.12), (-0.26, -0.24)), g.poly((0.56, 0.06), (0.0, -0.44), (0.12, -0.56)))
+        return [(trail, ORANGE), (mortars, STEEL), (bases, WHITE),
+                (g.circle(0.24, 0.52, 0.26), ORANGE), (g.circle(0.28, 0.56, 0.14), FLAME),
+                (g.circle(0.62, 0.12, 0.22), ORANGE), (g.circle(0.65, 0.15, 0.11), FLAME)]
+    if name == "Hud_FireTurrets":
+        # A round turret ring seen from above, a barrel at every corner, firing all around.
+        barrels = union(*(g.line(0.0, 0.0, 0.66 * sx, 0.66 * sy, 0.075) for sx in (1, -1) for sy in (1, -1)))
+        flashes = union(*(g.star(0.78 * sx, 0.78 * sy, 0.18, 0.07, 6) for sx in (1, -1) for sy in (1, -1)))
+        return [(flashes, ORANGE), (barrels, WHITE), (g.circle(0, 0, 0.36), STEEL), (g.circle(0, 0, 0.16), WHITE)]
+    if name == "Hud_FireTidal":
+        # A hull seen from the bow, blasting water jets out of both sides at once.
+        hull = union(g.poly((-0.3, 0.12), (0.3, 0.12), (0.18, -0.42), (-0.18, -0.42)), g.box(0, 0.36, 0.06, 0.26))
+        jets = union(g.poly((0.3, 0.02), (0.96, 0.26), (0.96, -0.3), (0.3, -0.14)), g.poly((-0.3, 0.02), (-0.96, 0.26), (-0.96, -0.3), (-0.3, -0.14)))
+        cores = union(g.poly((0.3, -0.02), (0.96, 0.08), (0.96, -0.12), (0.3, -0.1)), g.poly((-0.3, -0.02), (-0.96, 0.08), (-0.96, -0.12), (-0.3, -0.1)))
+        spray = union(*(g.circle(sx * x, y, r) for sx in (1, -1) for x, y, r in ((0.76, 0.44, 0.1), (0.56, 0.5, 0.07), (0.84, -0.5, 0.09))))
+        return [(jets, BLUE), (cores, CYAN), (spray, CYAN), (hull, WHITE)]
+    if name == "Hud_FireBoulder":
+        # A boulder lobbed up over a dotted arc and dropping onto the lower right, a Lift-Stone shard stuck in it.
+        arc = union(*(g.circle(-0.9 + 0.2 * k, 0.78 - 2.0 * (0.2 * k - 0.5) ** 2, 0.065 + 0.012 * k) for k in range(5)))
+        cx, cy = 0.36, -0.26
+        rock = g.poly(*((cx + r * float(np.cos(a)), cy + r * float(np.sin(a))) for r, a in (
+            (0.54, 0.3), (0.5, 1.0), (0.56, 1.7), (0.5, 2.4), (0.56, 3.1), (0.5, 3.8), (0.54, 4.6), (0.5, 5.4))))
+        facet = g.poly((cx - 0.34, cy + 0.12), (cx - 0.08, cy + 0.44), (cx + 0.28, cy + 0.36), (cx + 0.1, cy + 0.04), (cx - 0.22, cy - 0.06))
+        shard = g.poly((cx + 0.3, cy + 0.26), (cx + 0.62, cy + 0.66), (cx + 0.46, cy + 0.14))
+        return [(arc, WHITE), (rock, STEEL), (facet, WHITE), (shard, CYAN)]
+    return None
+
+
 def glyph_layers(name, g):
     """Painter's order list of (sdf, colour)."""
+    weapon = _weapon_button_layers(name, g)
+    if weapon is not None:
+        return weapon
     skill = _skill_layers(name, g)
     if skill is not None:
         return skill
