@@ -189,7 +189,8 @@ GLYPH_ICONS = (
     "Hud_FireBroadside", "Hud_Grapple",
     # Fire buttons for the ships with weapons of their own (dogfight-weapons-plan.md in the Unity project).
     "Hud_FireGun", "Hud_FireLightning", "Hud_FireSunbeam", "Hud_FirePlasma", "Hud_FireStarlight",
-    "Hud_FireFireball", "Hud_FireTurrets", "Hud_FireTidal", "Hud_FireBoulder", "Hud_Board", "Hud_Defend", "Hud_Repair",
+    "Hud_FireFireball", "Hud_FireTurrets", "Hud_FireTidal", "Hud_FireBoulder",
+    "Hud_FireFlame", "Hud_FireDragon", "Hud_FireAtomBomb", "Hud_FireHorn", "Hud_FireHeavyTor", "Hud_FireLocust", "Hud_Board", "Hud_Defend", "Hud_Repair",
     "Hud_AltitudeUp", "Hud_AltitudeDown", "Hud_ThrottleUp", "Hud_ThrottleDown",
     "Hud_Hull", "Hud_Crew", "Hud_Comms", "Hud_Timer", "Hud_Map", "Hud_Pause", "Hud_Settings", "Hud_Close", "Hud_Back", "Hud_Locked",
     "Target_Engine", "Target_Guns", "Target_Sails", "Target_Envelope", "Target_LiftCore", "Target_Reticle",

@@ -628,6 +628,70 @@ def _weapon_button_layers(name, g):
         cores = union(g.poly((0.3, -0.02), (0.96, 0.08), (0.96, -0.12), (0.3, -0.1)), g.poly((-0.3, -0.02), (-0.96, 0.08), (-0.96, -0.12), (-0.3, -0.1)))
         spray = union(*(g.circle(sx * x, y, r) for sx in (1, -1) for x, y, r in ((0.76, 0.44, 0.1), (0.56, 0.5, 0.07), (0.84, -0.5, 0.09))))
         return [(jets, BLUE), (cores, CYAN), (spray, CYAN), (hull, WHITE)]
+    if name == "Hud_FireFlame":
+        # A flamethrower nozzle on the left pouring a widening tongue of fire to the right.
+        nozzle = union(g.box(-0.7, 0.0, 0.2, 0.16, rnd=0.05), g.box(-0.44, 0.0, 0.08, 0.11))
+        outer = g.poly((-0.36, 0.1), (0.1, 0.3), (0.38, 0.52), (0.5, 0.36), (0.78, 0.6), (0.96, 0.22), (0.86, 0.02),
+                       (0.96, -0.24), (0.74, -0.58), (0.48, -0.36), (0.32, -0.5), (0.1, -0.3), (-0.36, -0.1))
+        middle = g.poly((-0.36, 0.07), (0.1, 0.18), (0.42, 0.3), (0.72, 0.16), (0.8, -0.02), (0.68, -0.22), (0.36, -0.28), (0.08, -0.18), (-0.36, -0.07))
+        core = g.poly((-0.36, 0.04), (0.14, 0.08), (0.46, 0.06), (0.52, -0.02), (0.42, -0.08), (0.12, -0.08), (-0.36, -0.04))
+        return [(outer, RED), (outer, EMBER), (middle, FLAME), (core, WHITE), (nozzle, STEEL)]
+    if name == "Hud_FireDragon":
+        # A horned dragon's head in profile, jaws open, breathing a gout of fire to the right.
+        head = g.poly((-0.92, -0.5), (-0.84, 0.12), (-0.5, 0.42), (-0.1, 0.48), (0.18, 0.34), (0.44, 0.26), (0.5, 0.12),
+                      (0.12, 0.06), (-0.04, -0.02), (0.3, -0.16), (0.32, -0.28), (-0.12, -0.32), (-0.48, -0.62))
+        horns = union(g.poly((-0.46, 0.4), (-0.9, 0.9), (-0.3, 0.46)), g.poly((-0.2, 0.46), (-0.48, 0.92), (-0.04, 0.46)))
+        spines = union(*(g.poly((x, y), (x - 0.14, y + 0.2), (x - 0.04, y - 0.04)) for x, y in ((-0.8, 0.02), (-0.86, -0.24))))
+        eye = g.circle(-0.06, 0.28, 0.07)
+        breath = g.poly((0.08, 0.02), (0.6, 0.34), (0.96, 0.4), (0.84, 0.06), (0.98, -0.18), (0.62, -0.3), (0.2, -0.1))
+        inner = g.poly((0.12, 0.0), (0.56, 0.16), (0.78, 0.08), (0.6, -0.12), (0.2, -0.06))
+        return [(breath, ORANGE), (inner, FLAME), (horns, PALE), (spines, PALE), (head, WHITE), (eye, RED)]
+    if name == "Hud_FireAtomBomb":
+        # A fat atom bomb falling nose-down: boxed tail fins on top and the radiation sign on its belly.
+        body = g.box(0.0, -0.12, 0.44, 0.62, rnd=0.42)
+        fins = union(g.poly((-0.42, 0.88), (-0.14, 0.44), (-0.02, 0.44), (-0.18, 0.88)), g.poly((0.42, 0.88), (0.14, 0.44), (0.02, 0.44), (0.18, 0.88)),
+                     g.box(0.0, 0.86, 0.46, 0.06))
+        badge = g.circle(0.0, -0.16, 0.32)
+        blades = union(*(g.poly((0.0, -0.16),
+                                (0.28 * float(np.cos(a - 0.5)), -0.16 + 0.28 * float(np.sin(a - 0.5))),
+                                (0.28 * float(np.cos(a + 0.5)), -0.16 + 0.28 * float(np.sin(a + 0.5))))
+                         for a in (np.pi / 2, np.pi / 2 + 2 * np.pi / 3, np.pi / 2 + 4 * np.pi / 3)))
+        hub = g.circle(0.0, -0.16, 0.1)
+        streaks = union(g.line(-0.74, 0.5, -0.66, 0.0, 0.035), g.line(0.74, 0.5, 0.66, 0.0, 0.035))
+        return [(streaks, WHITE), (fins, STEEL), (body, WHITE), (badge, GOLD), (cut(blades, g.circle(0.0, -0.16, 0.12)), INK), (hub, INK)]
+    if name == "Hud_FireHorn":
+        # A great shell horn blowing from the left, its bell flaring open, with rings of sound rolling out to the right.
+        horn = g.poly((-0.9, 0.06), (-0.62, 0.12), (-0.28, 0.2), (0.04, 0.34), (0.22, 0.5), (0.3, 0.46), (0.3, -0.46),
+                      (0.22, -0.5), (0.04, -0.34), (-0.28, -0.2), (-0.62, -0.12), (-0.9, -0.06))
+        ridges = union(*(g.box(x, 0.0, 0.025, h) for x, h in ((-0.52, 0.12), (-0.24, 0.2), (0.02, 0.32))))
+        mouth = g.box(-0.9, 0.0, 0.05, 0.1, rnd=0.03)
+        bell = g.box(0.28, 0.0, 0.06, 0.48, rnd=0.05)
+        waves = union(*(clip(g.ring(0.3, 0.0, r, 0.032), g.box(0.3 + r, 0.0, r * 0.8, h)) for r, h in ((0.3, 0.26), (0.48, 0.42), (0.66, 0.58))))
+        return [(waves, CYAN), (horn, PALE), (ridges, GOLD), (mouth, BRASS), (bell, WHITE)]
+    if name == "Hud_FireHeavyTor":
+        # Two heavy silver torpedoes side by side, noses to the right, one a little ahead of the other.
+        def torpedo(cx, cy):
+            body = g.box(cx, cy, 0.5, 0.13, rnd=0.12)
+            nose = g.poly((cx + 0.46, cy + 0.12), (cx + 0.74, cy), (cx + 0.46, cy - 0.12))
+            fins = union(g.poly((cx - 0.42, cy + 0.1), (cx - 0.62, cy + 0.3), (cx - 0.54, cy + 0.08)),
+                         g.poly((cx - 0.42, cy - 0.1), (cx - 0.62, cy - 0.3), (cx - 0.54, cy - 0.08)),
+                         g.box(cx - 0.56, cy, 0.04, 0.1))
+            shine = g.box(cx - 0.02, cy + 0.05, 0.36, 0.025, rnd=0.02)
+            band = g.box(cx + 0.3, cy, 0.025, 0.13)
+            return [(fins, IRON_DARK), (body, STEEL), (nose, SMOKE), (band, IRON_DARK), (shine, WHITE)]
+        return torpedo(-0.06, 0.34) + torpedo(0.1, -0.34)
+    if name == "Hud_FireLocust":
+        # A locust side on, head to the right: long body, folded wings, a big jumping hind leg and long antennae.
+        body = union(g.box(-0.08, -0.02, 0.5, 0.14, rnd=0.13), g.circle(0.48, 0.02, 0.17))
+        wings = g.poly((-0.4, 0.1), (0.24, 0.16), (0.12, 0.26), (-0.62, 0.22), (-0.86, 0.06))
+        vein = g.line(-0.7, 0.13, 0.16, 0.19, 0.018)
+        thigh = g.poly((-0.32, -0.06), (-0.06, 0.02), (-0.5, 0.42), (-0.64, 0.36))
+        shin = union(g.line(-0.57, 0.39, -0.72, -0.5, 0.035), g.line(-0.72, -0.5, -0.56, -0.56, 0.03))
+        legs = union(g.line(0.16, -0.1, 0.06, -0.48, 0.03), g.line(0.34, -0.08, 0.36, -0.46, 0.03),
+                     g.line(0.06, -0.48, 0.16, -0.54, 0.025), g.line(0.36, -0.46, 0.46, -0.52, 0.025))
+        antennae = union(g.line(0.56, 0.16, 0.92, 0.66, 0.022), g.line(0.6, 0.14, 0.98, 0.4, 0.022))
+        eye = g.circle(0.54, 0.06, 0.06)
+        return [(antennae, PALE), (legs, BROWN), (shin, BROWN), (body, GREEN), (thigh, GOLD), (wings, PALE), (vein, GOLD_DARK), (eye, RED)]
     if name == "Hud_FireBoulder":
         # A boulder lobbed up over a dotted arc and dropping onto the lower right, a Lift-Stone shard stuck in it.
         arc = union(*(g.circle(-0.9 + 0.2 * k, 0.78 - 2.0 * (0.2 * k - 0.5) ** 2, 0.065 + 0.012 * k) for k in range(5)))

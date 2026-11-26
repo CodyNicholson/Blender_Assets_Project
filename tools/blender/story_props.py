@@ -243,6 +243,48 @@ def dragon_wing(mb, hq):
     mb.socket("root", (0, 0, 0))
 
 
+def ice_chunk(mb, hq):
+    """The Glacier Fang's broadside shot: a jagged chunk of glacier ice, a pale glowing core split by big blue crystal
+    shards. The game spins it as it flies."""
+    rng = random.Random(53)
+    mb.sphere((0, 0, 0.34), (0.3, 0.24, 0.27), _q(hq, 5, 4), 3, "lightning", smooth=False)
+    shards = _q(hq, 6, 4)
+    for i in range(shards):
+        a = 2 * math.pi * i / shards + rng.uniform(-0.35, 0.35)
+        lift = rng.uniform(-0.8, 0.9)
+        length = rng.uniform(0.42, 0.68)
+        direction = (math.cos(a) * math.cos(lift), math.sin(a) * math.cos(lift), math.sin(lift))
+        tip = tuple(length * d for d in direction)
+        color = "gem_blue" if i % 2 == 0 else "wind"
+        mb.tube((0, 0, 0.34), (tip[0], tip[1], 0.34 + tip[2]), rng.uniform(0.15, 0.21), 0.0, sides=_q(hq, 4, 3), color=color)
+
+
+def train_torpedo(mb, hq):
+    """The Cloud-Train's torpedo: a little steam locomotive. Like the missile it runs nose-first along +Z; its
+    smokestack and cab roof face +Y, which the game keeps pointing up as it flies."""
+    sides = _q(hq, 10, 6)
+    # Boiler, iron with brass bands, capped by a dark smokebox and a glowing headlamp at the nose.
+    mb.lathe([(0.17, 0.25), (0.17, 0.95), (0.15, 1.02), (0.0, 1.04)], sides, lambda i, _j: "brass" if i == 1 and hq else "iron", smooth=False)
+    if hq:
+        for z in (0.45, 0.72):
+            mb.lathe([(0.185, z - 0.025), (0.185, z + 0.025)], sides, "brass", smooth=False)
+    mb.sphere((0, 0.08, 1.02), 0.06, 5, 3, "lamp", smooth=False)
+    # Smokestack and steam dome on top (+Y).
+    mb.tube((0, 0.12, 0.88), (0, 0.38, 0.88), 0.07, 0.1, sides=_q(hq, 6, 4), color="iron")
+    if hq:
+        mb.sphere((0, 0.17, 0.6), (0.08, 0.06, 0.08), 6, 3, "brass", smooth=False)
+    # Red cab at the back with a black roof, and a red cowcatcher under the nose.
+    mb.box((0, 0.06, 0.12), (0.4, 0.42, 0.26), "wood_red")
+    mb.box((0, 0.3, 0.12), (0.46, 0.05, 0.32), "iron")
+    mb.box((0, -0.16, 1.06), (0.3, 0.14, 0.12), "wood_red", top_scale=0.4)
+    # Wheels down both sides.
+    for sign in (1, -1):
+        for z in _q(hq, (0.38, 0.62, 0.86), (0.45, 0.8)):
+            with mb.xf(Matrix.Translation((sign * 0.18, -0.1, z)) @ Matrix.Rotation(math.pi / 2, 4, "Y")):
+                mb.lathe([(0.09, -0.03), (0.09, 0.03)], _q(hq, 8, 5), "wood_red", smooth=False)
+    mb.socket("funnel", (0, 0.4, 0.88))
+
+
 def lift_core(mb, hq):
     """The heart of every airship and a sub-system target. Morrow sabotages this one."""
     sides = _q(hq, 12, 6)
@@ -261,13 +303,19 @@ def lift_core(mb, hq):
     mb.socket("charge_slot", (0.72, 0, 0.8))
 
 
-def lift_stone(mb, hq):
+def lift_stone(mb, hq, base=True):
     """Raw Lift-Stone pickup: civilisation's fuel. Glows, so it reads as a collectible at distance."""
     rng = random.Random(14)
     for i, (x, y, r, h) in enumerate(((0, 0, 0.22, 0.85), (0.2, 0.08, 0.13, 0.5), (-0.16, 0.12, 0.11, 0.44), (-0.03, -0.2, 0.09, 0.36)) if hq else ((0, 0, 0.22, 0.85), (0.2, 0.08, 0.12, 0.46))):
         with mb.xf(Matrix.Translation((x, y, 0.08)) @ Matrix.Rotation(rng.uniform(-0.28, 0.28), 4, "X") @ Matrix.Rotation(rng.uniform(-0.28, 0.28), 4, "Y")):
             mb.lathe([(r * 0.6, -0.08), (r, h * 0.25), (r * 0.74, h * 0.72), (r * 0.06, h)], _q(hq, 6, 4), "liftstone", smooth=False)
-    mb.lathe([(0.38, 0.0), (0.26, 0.12)], _q(hq, 7, 4), "liftstone_dark", smooth=False)
+    if base:
+        mb.lathe([(0.38, 0.0), (0.26, 0.12)], _q(hq, 7, 4), "liftstone_dark", smooth=False)
+
+
+def lift_stone_shot(mb, hq):
+    """The Crystal Sanctum's torpedo: the Lift-Stone's glowing crystals alone, without the dark rock they grow from."""
+    lift_stone(mb, hq, base=False)
 
 
 def ammo_chain_shot(mb, hq):

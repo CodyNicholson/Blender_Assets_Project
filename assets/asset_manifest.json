@@ -1820,6 +1820,19 @@
         }
       }
     },
+    "Hud_FireAtomBomb": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireAtomBomb_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireAtomBomb_LQ.png",
+          "size": 128
+        }
+      }
+    },
     "Hud_FireBoulder": {
       "source_model": null,
       "variants": {
@@ -1846,6 +1859,19 @@
         }
       }
     },
+    "Hud_FireDragon": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireDragon_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireDragon_LQ.png",
+          "size": 128
+        }
+      }
+    },
     "Hud_FireFireball": {
       "source_model": null,
       "variants": {
@@ -1855,6 +1881,19 @@
         },
         "LQ": {
           "file": "T_Icon_Hud_FireFireball_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Hud_FireFlame": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireFlame_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireFlame_LQ.png",
           "size": 128
         }
       }
@@ -1872,6 +1911,32 @@
         }
       }
     },
+    "Hud_FireHeavyTor": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireHeavyTor_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireHeavyTor_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Hud_FireHorn": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireHorn_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireHorn_LQ.png",
+          "size": 128
+        }
+      }
+    },
     "Hud_FireLightning": {
       "source_model": null,
       "variants": {
@@ -1881,6 +1946,19 @@
         },
         "LQ": {
           "file": "T_Icon_Hud_FireLightning_LQ.png",
+          "size": 128
+        }
+      }
+    },
+    "Hud_FireLocust": {
+      "source_model": null,
+      "variants": {
+        "HQ": {
+          "file": "T_Icon_Hud_FireLocust_HQ.png",
+          "size": 256
+        },
+        "LQ": {
+          "file": "T_Icon_Hud_FireLocust_LQ.png",
           "size": 128
         }
       }
@@ -16938,6 +17016,69 @@
         }
       },
       "default_faction": "Sorcerer"
+    },
+    "SM_Prop_IceChunk": {
+      "variants": {
+        "HQ": {
+          "tier": "prop",
+          "tris": 98
+        },
+        "LQ": {
+          "tier": "prop_low",
+          "tris": 52
+        }
+      },
+      "sockets": {
+        "HQ": {},
+        "LQ": {}
+      },
+      "default_faction": "Azure"
+    },
+    "SM_Prop_TrainTorpedo": {
+      "variants": {
+        "HQ": {
+          "tier": "prop",
+          "tris": 430
+        },
+        "LQ": {
+          "tier": "prop_low",
+          "tris": 182
+        }
+      },
+      "sockets": {
+        "HQ": {
+          "funnel": [
+            0.0,
+            0.92,
+            -0.325
+          ]
+        },
+        "LQ": {
+          "funnel": [
+            0.0,
+            0.92,
+            -0.325
+          ]
+        }
+      },
+      "default_faction": "Crimson"
+    },
+    "SM_Prop_LiftStoneShot": {
+      "variants": {
+        "HQ": {
+          "tier": "prop",
+          "tris": 176
+        },
+        "LQ": {
+          "tier": "prop_low",
+          "tris": 56
+        }
+      },
+      "sockets": {
+        "HQ": {},
+        "LQ": {}
+      },
+      "default_faction": "Crimson"
     },
     "SM_Prop_DragonBody": {
       "variants": {
