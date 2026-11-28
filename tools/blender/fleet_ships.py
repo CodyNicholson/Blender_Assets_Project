@@ -734,6 +734,176 @@ def aegis_destroyer(mb, hq):
     mb.socket("helm", (0, y_of(0.48), deck_z + 2.2))
 
 
+def delphinus(mb, hq):
+    """14b. Modern Battleship: Sleek stepped-keel Sovereign Stratum sky-cruiser with bow laser, ventral wings and pagoda spire."""
+    length, half, deck_z = 27.0, 3.05, 4.2
+    y_of = lambda t: -length / 2 + t * length
+
+    # Custom stepped hull profile matching delphinus.jpg:
+    # Long narrow foredeck with a deep sculpted chin keel (t=0.34..0.44), sharp waist step up at t=0.52, tapered stern.
+    profile = [
+        (0.00, 0.42, 2.35, deck_z + 0.08),
+        (0.08, 1.35, 1.85, deck_z + 0.04),
+        (0.20, 1.85, 1.35, deck_z),
+        (0.32, 2.15, 0.72, deck_z),
+        (0.42, 2.45, 0.55, deck_z),
+        (0.47, 2.55, 1.30, deck_z),
+        (0.53, 2.75, 2.10, deck_z + 0.10),
+        (0.66, 3.05, 2.05, deck_z + 0.15),
+        (0.80, 2.85, 2.20, deck_z + 0.15),
+        (0.92, 1.85, 2.60, deck_z + 0.05),
+        (1.00, 0.55, 3.10, deck_z - 0.15),
+    ]
+    if not hq:
+        profile = [profile[i] for i in (0, 2, 4, 6, 8, 10)]
+    stations = [(y_of(t), w, kz, dz) for t, w, kz, dz in profile]
+    rows = _q(hq, 5, 3)
+
+    def _hull_paint(i, row):
+        t = profile[i][0]
+        if row == 0:
+            return "navy" if t < 0.5 else "steel"
+        if row == 1:
+            return "silver" if t < 0.5 else "faction_a"
+        if row <= rows - 2:
+            return "faction_a" if row == rows - 2 else ("faction_b" if t < 0.48 else "steel")
+        return "silver" if hq else "faction_a"
+
+    shell(mb, stations, rows, _hull_paint, power=0.32, tumble=0.06, deck_color="iron_light", cell_paint=_hull_paint)
+
+    # Rub-rail gunwale accent & bow emblem plate.
+    if hq:
+        for sign in (1, -1):
+            mb.box((sign * 1.95, y_of(0.24), deck_z - 0.14), (0.14, 11.5, 0.18), "silver")
+        mb.box((0, y_of(0.0) - 0.06, deck_z - 0.55), (0.72, 0.2, 0.55), "faction_a")
+
+    # Sleek vertical swept-back dorsal fin at the prow tip.
+    mb.plate(
+        [
+            (0.0, y_of(0.03), deck_z - 0.1),
+            (0.0, y_of(0.11), deck_z - 0.1),
+            (0.0, y_of(0.115), deck_z + 2.05),
+            (0.0, y_of(0.095), deck_z + 2.05),
+        ],
+        0.18,
+        "faction_a",
+    )
+    if hq:
+        mb.box((0.0, y_of(0.105), deck_z + 1.0), (0.21, 0.24, 2.0), "silver")
+
+    # Recessed bow laser aperture on the prow face.
+    laser_y = y_of(0.0) - 0.12
+    laser_z = deck_z - 0.88
+    mb.tube((0, y_of(0.04), laser_z), (0, laser_y, laser_z), 0.34, 0.28, sides=_q(hq, 8, 5), color="silver")
+    mb.sphere((0, laser_y - 0.02, laser_z), (0.2, 0.12, 0.2), _q(hq, 6, 4), 3, "liftstone")
+    mb.socket("siege_muzzle", (0, laser_y - 0.14, laser_z))
+    mb.socket("muzzle_F0", (0, laser_y - 0.14, laser_z))
+
+    # Midship diamond vertical cheek fins at the waist step (t = 0.45).
+    fin_y = y_of(0.45)
+    for sign in (1, -1):
+        mb.plate(
+            [
+                (sign * 2.55, fin_y, deck_z - 2.35),
+                (sign * 3.15, fin_y - 0.85, deck_z - 0.55),
+                (sign * 2.75, fin_y, deck_z + 0.85),
+                (sign * 2.35, fin_y + 0.85, deck_z - 0.55),
+            ],
+            0.28,
+            "faction_a",
+        )
+        if hq:
+            mb.box((sign * 2.82, fin_y, deck_z - 0.6), (0.12, 0.45, 2.4), "navy")
+
+    # Dark recessed ventral exhaust/intake bay under the waist step.
+    mb.box((0, y_of(0.60), 1.85), (3.4, 3.6, 0.72), "iron", top_scale=0.88)
+    if hq:
+        for vy in (y_of(0.54), y_of(0.58), y_of(0.62), y_of(0.66)):
+            for sign in (1, -1):
+                mb.box((sign * 1.45, vy, 1.82), (0.45, 0.45, 0.45), "abyss")
+
+    # Twin swept-downward ventral stabilizer wings (signature silhouette).
+    for sign in (1, -1):
+        # Cobalt shoulder root fairing.
+        mb.box((sign * 2.75, y_of(0.75), 2.35), (1.35, 2.6, 0.9), "faction_a", top_scale=0.82)
+        # Long angled silver blade sweeping outward and down to z = 0.0.
+        mb.plate(
+            [
+                (sign * 3.1, y_of(0.73), 2.05),
+                (sign * 6.85, y_of(0.84), 0.05),
+                (sign * 6.55, y_of(0.90), 0.0),
+                (sign * 2.8, y_of(0.82), 1.75),
+            ],
+            0.22,
+            "silver",
+        )
+        if hq:
+            mb.plate(
+                [
+                    (sign * 3.15, y_of(0.72), 2.12),
+                    (sign * 6.85, y_of(0.835), 0.12),
+                    (sign * 6.72, y_of(0.85), 0.05),
+                    (sign * 3.05, y_of(0.74), 2.02),
+                ],
+                0.14,
+                "faction_a",
+            )
+
+    # Fore superfiring naval twin-barrel turrets + twin flanking waist turrets.
+    _turret(mb, 0, y_of(0.32), deck_z, 0.85, 0.58, 2, 1.9, 0.11, hq, "silver", "iron_light", pitch=0.05)
+    mb.box((0, y_of(0.44), deck_z + 0.45), (1.9, 2.3, 0.9), "steel", top_scale=0.9)
+    _turret(mb, 0, y_of(0.44), deck_z + 0.90, 0.82, 0.56, 2, 1.85, 0.11, hq, "silver", "iron_light", pitch=0.05)
+    for sign in (1, -1):
+        _turret(mb, sign * 1.9, y_of(0.57), deck_z + 0.35, 0.68, 0.48, 2, 1.55, 0.09, hq, "steel", "iron_light", pitch=0.04)
+
+    # Aft stepped pagoda bridge citadel, recessed shadow bay, dome cupola & spreader-wing spire.
+    mb.box((0, y_of(0.69), deck_z + 0.95), (3.3, 1.8, 1.55), "abyss")
+    mb.box((0, y_of(0.76), deck_z + 1.25), (4.6, 4.0, 2.3), "steel", top_scale=0.86)
+    mb.box((0, y_of(0.76), deck_z + 2.55), (5.8, 3.0, 0.42), "iron_light", top_scale=0.92)
+    if hq:
+        for sign in (1, -1):
+            mb.box((sign * 2.25, y_of(0.76), deck_z + 1.55), (0.2, 1.6, 0.95), "faction_a")
+            mb.box((sign * 2.28, y_of(0.76), deck_z + 1.55), (0.22, 1.1, 0.45), "liftstone")
+
+    # Rounded armored dome atop the bridge wings.
+    dome_y = y_of(0.75)
+    mb.sphere((0, dome_y, deck_z + 3.0), (1.45, 1.75, 1.15), _q(hq, 10, 6), _q(hq, 6, 4), "silver")
+    # Upper lookout neck, sharp horizontal spreader wings, and pinnacle spire.
+    mb.box((0, dome_y + 0.25, deck_z + 4.45), (1.35, 1.6, 1.35), "steel", top_scale=0.72)
+    if hq:
+        mb.box((0, dome_y - 0.52, deck_z + 4.65), (0.95, 0.1, 0.26), "liftstone")
+    mb.plate(
+        [
+            (-2.35, dome_y + 0.32, deck_z + 5.15),
+            (2.35, dome_y + 0.32, deck_z + 5.15),
+            (0.45, dome_y - 0.15, deck_z + 5.45),
+            (-0.45, dome_y - 0.15, deck_z + 5.45),
+        ],
+        0.14,
+        "iron_light",
+    )
+    mb.tube((0, dome_y + 0.25, deck_z + 5.1), (0, dome_y + 0.25, deck_z + 8.35), 0.36, 0.05, sides=_q(hq, 6, 4), color="silver")
+
+    # Stern spinner hub & propulsion sockets (Models.cs mounts the spinning SM_Ship_Propeller on propeller_C0).
+    stern_y = y_of(1.0)
+    stern_z = deck_z - 0.65
+    mb.tube((0, stern_y - 0.8, stern_z), (0, stern_y + 0.35, stern_z), 0.65, 0.24, sides=_q(hq, 8, 5), color="iron")
+    mb.socket("propeller_C0", (0, stern_y + 0.38, stern_z))
+    for sign, label in ((1, "L"), (-1, "R")):
+        mb.tube((sign * 1.4, y_of(0.88), stern_z + 0.1), (sign * 1.4, y_of(0.95), stern_z + 0.1), 0.42, 0.34, sides=_q(hq, 6, 4), color="steel")
+        mb.socket(f"afterburner_{label}", (sign * 1.4, y_of(0.96), stern_z + 0.1))
+
+    # Standard sockets (broadside + base sockets).
+    def _delphinus_half(y):
+        t = max(0.0, min(1.0, (y + length / 2) / length))
+        return 2.45 if t < 0.48 else 2.95
+
+    broadside(mb, [y_of(t) for t in (0.36, 0.52, 0.68)], deck_z - 0.45, _delphinus_half, 0.72, 0.10, hq, draw=hq, color="silver", carriage="steel")
+    base_sockets(mb, half, deck_z, deck_z + 2.2, dome_y + 0.3, deck_z + 5.0)
+    mb.socket("lift_core", (0, y_of(0.62), 2.5))
+    mb.socket("helm", (0, dome_y + 0.25, deck_z + 4.5))
+
+
 def sky_submarine(mb, hq):
     """15. Modern Battleship: Cloud-diving U-boat attack submarine with conning tower, periscopes and torpedo tubes."""
     length, radius, z_mid = 24.0, 2.35, 2.6
@@ -1471,6 +1641,7 @@ FLEET_SHIPS = {
     "SM_Ship_FleetCarrier": fleet_carrier,
     "SM_Ship_HeavyCruiser": heavy_cruiser,
     "SM_Ship_GunshipMonitor": gunship_monitor,
+    "SM_Ship_Delphinus": delphinus,
     # Creative & Fantastical Designs (19-24)
     "SM_Ship_ClockworkSovereign": clockwork_sovereign,
     "SM_Ship_SkyNautilus": sky_nautilus,
@@ -1506,6 +1677,7 @@ FLEET_FACTIONS = {
     "SM_Ship_FleetCarrier": "Gilded",
     "SM_Ship_HeavyCruiser": "Warden",
     "SM_Ship_GunshipMonitor": "Scrap",
+    "SM_Ship_Delphinus": "Azure",
     "SM_Ship_ClockworkSovereign": "Gilded",
     "SM_Ship_SkyNautilus": "Nomad",
     "SM_Ship_BoneRevenant": "Sorcerer",

@@ -825,6 +825,31 @@ def glyph_layers(name, g):
     if name == "Ability_MorrowRadar":
         sweep = g.poly((0, 0), (0.08, 0.9), (0.84, 0.3))
         return [(clip(sweep, g.circle(0, 0, 0.8)), (0.44, 0.9, 0.56)), (union(g.ring(0, 0, 0.8, 0.045), g.ring(0, 0, 0.42, 0.035)), WHITE), (union(g.circle(0.34, 0.5, 0.075), g.circle(-0.4, -0.22, 0.075)), RED), (g.circle(0, 0, 0.07), WHITE)]
+    if name == "Accolade_Controller":
+        bumpers = union(g.box(-0.50, 0.42, 0.24, 0.11, rot=0.06, rnd=0.06), g.box(0.50, 0.42, 0.24, 0.11, rot=-0.06, rnd=0.06))
+        shell = union(
+            g.box(0.0, 0.10, 0.52, 0.32, rnd=0.14),
+            g.circle(-0.48, 0.06, 0.36),
+            g.circle(0.48, 0.06, 0.36),
+            g.line(-0.56, 0.04, -0.70, -0.48, 0.21),
+            g.line(0.56, 0.04, 0.70, -0.48, 0.21),
+        )
+        pads = union(g.circle(-0.48, 0.06, 0.24), g.circle(0.48, 0.06, 0.24))
+        dpad = union(g.box(-0.48, 0.06, 0.17, 0.055, rnd=0.02), g.box(-0.48, 0.06, 0.055, 0.17, rnd=0.02))
+        dimple = g.circle(-0.48, 0.06, 0.03)
+        menu_pills = union(g.line(-0.14, 0.00, -0.05, 0.07, 0.03), g.line(0.05, 0.00, 0.14, 0.07, 0.03))
+        return [
+            (bumpers, BRASS),
+            (shell, SMOKE),
+            (pads, IRON),
+            (dpad, INK),
+            (dimple, IRON),
+            (menu_pills, IRON_DARK),
+            (g.circle(0.48, 0.19, 0.064), GOLD),
+            (g.circle(0.48, -0.07, 0.064), GREEN),
+            (g.circle(0.35, 0.06, 0.064), BLUE),
+            (g.circle(0.61, 0.06, 0.064), RED),
+        ]
     raise KeyError(name)
 
 

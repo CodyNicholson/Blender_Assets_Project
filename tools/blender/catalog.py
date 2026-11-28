@@ -15,8 +15,10 @@ import fx_catalog
 import kit
 import palette
 import props
+import ship_styles
 import ships
 import story_characters
+import character_styles
 import story_env
 import story_props
 import story_ships
@@ -71,6 +73,8 @@ STATIC = {
     "SM_Ship_Lifeboat": (_SHIP, story_ships.lifeboat),
     # Expanded 30-ship airship fleet (elemental, sci-fi, modern battleship, fantastical, outlaw).
     **{name: (_SHIP, fn) for name, fn in fleet_ships.FLEET_SHIPS.items()},
+    # Alternate ship styles (minimum 3 styles per Hangar ship).
+    **{name: (_SHIP, fn) for name, fn in ship_styles.STYLE_SHIPS.items()},
     # Alpha-free effects for devices that can't afford transparent overdraw.
     "SM_VFX_Flame": (_PROP, story_vfx.flame),
     "SM_VFX_Fireball": (_PROP, story_vfx.fireball),
@@ -116,6 +120,7 @@ STATIC = {
     "SM_Prop_WreckChunk": (_PROP, story_props.wreck_chunk),
     "SM_Prop_HookSabre": (_PROP, story_props.boarding_hook_sabre),
     "SM_Prop_RoyalSabre": (_PROP, story_props.royal_sabre),
+    "SM_Prop_ArabianSaif": (_PROP, story_props.arabian_saif),
     "SM_Prop_DuelPistol": (_PROP, story_props.duel_pistol),
     "SM_Prop_AnchorHammer": (_PROP, story_props.anchor_hammer),
     "SM_Prop_TwinScimitar": (_PROP, story_props.twin_scimitar),
@@ -180,6 +185,8 @@ STATIC = {
     "SM_Env_FreeSkiesScrapIsle": (_ENV, story_env.free_skies_scrap_isle),
     "SM_Env_FreeSkiesSkyVault": (_ENV, story_env.free_skies_sky_vault),
     "SM_Env_FreeSkiesLiftMine": (_ENV, story_env.free_skies_lift_mine),
+    "SM_Env_ThroneRoom": (_ENV, story_env.throne_room),
+    "SM_Env_MarbleIsle": (_ENV, story_env.marble_isle),
 }
 SKELETAL = {
     "SK_PirateCaptain": "PirateCaptain",
@@ -273,11 +280,19 @@ DEFAULT_FACTIONS = {
     "SM_Env_CellBlock": "Warden",
     "SM_Env_WarRoom": "Gilded",
     "SM_Env_LiftCoreChamber": "Gilded",
+    "SM_Env_ThroneRoom": "Gilded",
+    "SM_Env_MarbleIsle": "Gilded",
     "SM_Env_ScrapDeck": "Scrap",
     "SK_ArmadaSoldier": "Gilded",
     "SK_ArmadaOfficer": "Gilded",
     "SK_RoyalGuard": "Gilded",
     "SK_CassianAdmiral": "Gilded",
+    "SK_CassianUnleashed": "Gilded",
+    "SK_ExchequerVaelen": "Gilded",
+    "SK_MarshalVance": "Gilded",
+    "SK_Emperor": "Gilded",
+    "SK_EmperorAscendant": "Gilded",
+    "SM_Prop_ArabianSaif": "Gilded",
     "SK_Krag": "Scrap",
     "SK_Vex": "Syndicate",
     "SK_Vesper": "Syndicate",
@@ -289,10 +304,12 @@ DEFAULT_FACTIONS = {
     "SM_Prop_PoisonFlask": "Emerald",
     "SK_Malakor": "Warden",
     **fleet_ships.FLEET_FACTIONS,
+    **ship_styles.STYLE_FACTIONS,
+    **character_styles.STYLE_FACTIONS,
 }
 
 
-HELD_MELEE = ["SM_Prop_Cutlass", "SM_Prop_BoardingAxe", "SM_Prop_HookSabre", "SM_Prop_RoyalSabre", "SM_Prop_AnchorHammer", "SM_Prop_TwinScimitar", "SM_Prop_CorsairLance", "SM_Prop_Chainsaw", "SM_Prop_WardenFlail", "SM_Prop_SableDagger", "SM_Prop_Spyglass", "SM_Prop_BigWrench", "SM_Prop_ArmadaHalberd", "SM_Prop_ShadowStaff", "SM_Prop_DriftwoodLyre", "SM_Prop_LightningStaff", "SM_Prop_Linstock", "SM_Prop_BoneSaw", "SM_Prop_ScrapCutlass", "SM_Prop_CaptainCutlass", "SM_Prop_KingCutlass", "SM_Prop_SwordCane", "SM_Prop_GildedRapier", "SM_Prop_FleetCutlass", "SM_Prop_RegulatorKey", "SM_Prop_WeatherStaff", "SM_Prop_Bomb"]
+HELD_MELEE = ["SM_Prop_Cutlass", "SM_Prop_BoardingAxe", "SM_Prop_HookSabre", "SM_Prop_RoyalSabre", "SM_Prop_ArabianSaif", "SM_Prop_AnchorHammer", "SM_Prop_TwinScimitar", "SM_Prop_CorsairLance", "SM_Prop_Chainsaw", "SM_Prop_WardenFlail", "SM_Prop_SableDagger", "SM_Prop_Spyglass", "SM_Prop_BigWrench", "SM_Prop_ArmadaHalberd", "SM_Prop_ShadowStaff", "SM_Prop_DriftwoodLyre", "SM_Prop_LightningStaff", "SM_Prop_Linstock", "SM_Prop_BoneSaw", "SM_Prop_ScrapCutlass", "SM_Prop_CaptainCutlass", "SM_Prop_KingCutlass", "SM_Prop_SwordCane", "SM_Prop_GildedRapier", "SM_Prop_FleetCutlass", "SM_Prop_RegulatorKey", "SM_Prop_WeatherStaff", "SM_Prop_Bomb"]
 HELD_GUNS = ["SM_Prop_Flintlock", "SM_Prop_DuelPistol", "SM_Prop_HandMortar", "SM_Prop_ArmadaMusket", "SM_Prop_Blunderbuss", "SM_Prop_GatlingGun"]
 
 

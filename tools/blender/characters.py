@@ -478,14 +478,21 @@ CLIPS = {
 }
 
 
-def _apply_pose(arm, pose, frame, parents=None):
+def _apply_pose(arm, pose, frame, parents=None, previous=None):
     for bone_name in parents or BONE_PARENTS:
         pbone = arm.pose.bones[bone_name]
         pbone.rotation_mode = "QUATERNION"
         rest = pbone.bone.matrix_local.to_3x3()
         degrees = pose.get(bone_name, (0, 0, 0))
         world_q = Euler([math.radians(a) for a in degrees], "XYZ").to_quaternion()
-        pbone.rotation_quaternion = (rest.inverted() @ world_q.to_matrix() @ rest).to_quaternion()
+        local_q = (rest.inverted() @ world_q.to_matrix() @ rest).to_quaternion()
+        # A matrix gives back the shorter of the two equal quaternions, so a turn past 180 degrees (a roll) would
+        # flip sign between keys and interpolate the short way back. Keep each key on the previous one's side.
+        if previous is not None:
+            if bone_name in previous and previous[bone_name].dot(local_q) < 0:
+                local_q.negate()
+            previous[bone_name] = local_q.copy()
+        pbone.rotation_quaternion = local_q
         pbone.keyframe_insert("rotation_quaternion", frame=frame, group=bone_name)
     hips = arm.pose.bones["hips"]
     rest = hips.bone.matrix_local.to_3x3()
@@ -500,8 +507,9 @@ def add_clips(arm, clips=None, parents=None):
         action = bpy.data.actions.new(clip)
         action.use_fake_user = False
         arm.animation_data.action = action
-        for frame, pose in frames.items():
-            _apply_pose(arm, pose, frame, parents)
+        previous = {}
+        for frame, pose in sorted(frames.items()):
+            _apply_pose(arm, pose, frame, parents, previous)
         arm.animation_data.action = None
         track = arm.animation_data.nla_tracks.new()
         track.name = clip

@@ -670,6 +670,52 @@ def royal_sabre(mb, hq):
     mb.socket("trail_tip", (0.05, 0, 1.08))
 
 
+def arabian_saif(mb, hq):
+    """Cassian Unleashed's massive silver-and-gold curved Arabian saif, wielded in pairs."""
+    if hq:
+        # Ornate gold pommel & navy-wrapped grip with gold rings.
+        mb.sphere((0, 0, 0.025), 0.042, 6, 3, "gold")
+        mb.tube((0, 0, 0.045), (0, 0, 0.21), 0.022, 0.025, sides=6, color="navy")
+        for z in (0.075, 0.13, 0.185):
+            mb.lathe([(0.027, z - 0.008), (0.027, z + 0.008)], 6, "gold", smooth=False)
+        # Sweeping S-curved gold crossguard quillons.
+        mb.path([(-0.15, 0, 0.26), (-0.08, 0, 0.21), (0.0, 0, 0.22), (0.08, 0, 0.23), (0.16, 0, 0.18)],
+                [0.01, 0.018, 0.024, 0.018, 0.01], 5, "gold")
+        mb.box((0, 0, 0.225), (0.06, 0.042, 0.045), "gold")
+        # Large curved Arabian saif blade: wide flared belly and sweeping scimitar tip in silver.
+        mb.plate([
+            (-0.026, 0, 0.23), (0.032, 0, 0.23),
+            (0.056, 0, 0.50), (0.125, 0, 0.78),
+            (0.22, 0, 1.04), (0.28, 0, 1.24),
+            (0.14, 0, 1.13), (0.038, 0, 0.90),
+            (-0.024, 0, 0.56),
+        ], 0.010, "silver")
+        # Prominent gold spine & gilded fuller inlay running up the curved blade.
+        mb.plate([
+            (-0.010, -0.007, 0.25), (0.014, -0.007, 0.25),
+            (0.072, -0.007, 0.78), (0.165, -0.007, 1.07),
+            (0.135, -0.007, 1.04), (0.048, -0.007, 0.76),
+        ], 0.005, "gold")
+        mb.plate([
+            (-0.014, 0.007, 0.25), (0.008, 0.007, 0.25),
+            (0.048, 0.007, 0.82), (0.022, 0.007, 0.82),
+        ], 0.005, "gold")
+    else:
+        mb.tube((0, 0, 0.0), (0, 0, 0.21), 0.026, sides=4, color="navy")
+        mb.box((0, 0, 0.22), (0.24, 0.038, 0.038), "gold")
+        mb.plate([
+            (-0.026, 0, 0.23), (0.032, 0, 0.23),
+            (0.125, 0, 0.78), (0.28, 0, 1.24),
+            (0.038, 0, 0.90), (-0.022, 0, 0.56),
+        ], 0.014, "silver")
+        mb.plate([
+            (-0.012, -0.008, 0.26), (0.012, -0.008, 0.26),
+            (0.15, -0.008, 1.04), (0.12, -0.008, 1.04),
+        ], 0.006, "gold")
+    mb.socket("grip", (0, 0, 0.12))
+    mb.socket("trail_tip", (0.28, 0, 1.24))
+
+
 def duel_pistol(mb, hq):
     """Ornate pistol for the Lift-Core duel, oriented for gun.R or gun.L like SM_Prop_Flintlock."""
     upright = Matrix(((0, 0, 1, 0), (-1, 0, 0, 0), (0, -1, 0, 0), (0, 0, 0, 1)))
@@ -690,11 +736,15 @@ def duel_pistol(mb, hq):
 def anchor_hammer(mb, hq):
     """Krag's weapon: a two-metre ship's anchor swung by hand, with a chain wrapped round the shaft."""
     h = 1.65
-    mb.tube((0, 0, 0.0), (0, 0, h), 0.04, 0.04, sides=_q(hq, 6, 4), color="iron")
+    # The shaft runs on up into the crown, and an iron collar clamps the head onto it, so nothing floats.
+    mb.tube((0, 0, 0.0), (0, 0, h + 0.2), 0.04, 0.04, sides=_q(hq, 6, 4), color="iron")
     with mb.xf(Matrix.Translation((0, 0, 0.0))):
         mb.tube((0, 0, 0.12), (0, 0, 0.4), 0.05, sides=_q(hq, 6, 4), color="leather_dark")
     arc = [(-0.5, 0, h - 0.2), (-0.32, 0, h + 0.12), (0, 0, h + 0.2), (0.32, 0, h + 0.12), (0.5, 0, h - 0.2)]
     mb.path(arc, [0.012, 0.09, 0.12, 0.09, 0.012], _q(hq, 5, 3), "iron_light")
+    mb.box((0, 0, h + 0.06), (0.15, 0.11, 0.24), "iron_light")
+    if hq:
+        mb.tube((0, 0, h - 0.1), (0, 0, h - 0.04), 0.06, sides=6, color="rust")
     mb.tube((-0.28, 0, h - 0.45), (0.28, 0, h - 0.45), 0.032, sides=_q(hq, 4, 3), color="rust_dark")
     if hq:
         for sign in (1, -1):

@@ -1039,3 +1039,64 @@ def free_skies_lift_mine(mb, hq):
                 mb.tube((px, -0.4, -5.0), (px, -0.4, 0.9), 0.14, sides=_q(hq, 4, 3), color="wood_dark")
             mb.box((0, -0.4, 0.9), (3.4, 2.0, 0.22), "wood_mid")
             _house(mb, 0, 0.4, 0.0, 2.2, 1.7, 1.9, "wood_mid", "iron", lit="lamp" if hq else None)
+
+
+def throne_room(mb, hq):
+    """Act V Grand Sun-Throne Hall: polished white-marble floor with royal crimson-and-gold runner,
+    flanking gilded marble colonnade, raised imperial dais and throne, and the Prime Lift-Core behind it."""
+    half_l, half_w, floor, ceil = 8.5, 4.6, 0.5, 4.8
+    rows = _q(hq, 6, 3)
+    pw = 2 * half_w / rows
+    for r in range(rows):
+        mb.box((0, -half_w + (r + 0.5) * pw, floor - 0.05), (2 * half_l - 0.02, pw - 0.03, 0.1), ("enamel", "cloth_white")[r % 2])
+    mb.box((0, 0, 0.0), (2 * half_l, 2 * half_w, 0.8), "rock_dark")
+    # Royal crimson carpet with gold trim leading up to the dais.
+    mb.box((0, 0, floor + 0.012), (2 * half_l - 2.2, 2.5, 0.022), "velvet")
+    for sign in (1, -1):
+        mb.box((0, sign * 1.3, floor + 0.014), (2 * half_l - 2.2, 0.09, 0.026), "gold")
+    # Flanking marble & gold colonnade along +/- X and back wall (camera -Y side stays open).
+    cols = _q(hq, 5, 3)
+    for i in range(cols):
+        x = -half_l + 1.2 + i * (2 * half_l - 2.4) / max(1, cols - 1)
+        for y in (half_w - 0.35, -half_w + 0.45):
+            if y < 0 and i in (1, 2, 3):
+                continue
+            mb.tube((x, y, floor), (x, y, ceil), 0.28, sides=_q(hq, 8, 5), color="enamel")
+            mb.box((x, y, floor + 0.12), (0.72, 0.72, 0.24), "gold")
+            mb.box((x, y, ceil - 0.12), (0.72, 0.72, 0.24), "gold")
+    # Raised golden dais & imperial throne at +Y.
+    mb.box((0, 3.3, floor + 0.18), (4.6, 2.2, 0.36), "enamel")
+    mb.box((0, 3.3, floor + 0.37), (4.7, 2.3, 0.06), "gold")
+    mb.box((0, 3.65, floor + 0.68), (1.15, 0.85, 0.6), "velvet")
+    mb.box((0, 4.02, floor + 1.6), (1.2, 0.22, 1.8), "gold")
+    mb.box((0, 4.02, floor + 2.58), (1.45, 0.26, 0.22), "gold")
+    # Towering Prime Lift-Core monolith glowing directly behind the throne.
+    with mb.xf(Matrix.Translation((0, 4.9, floor + 0.2))):
+        mb.lathe([(0.65, 0.0), (1.05, 1.4), (1.15, 3.2), (0.75, 4.6), (0.15, 5.6)], _q(hq, 8, 6), "liftstone", smooth=False)
+        for z in (1.2, 2.8, 4.1):
+            mb.lathe([(1.28, z - 0.1), (1.28, z + 0.1), (1.45, z + 0.1), (1.45, z - 0.1)], _q(hq, 10, 6), "gold", smooth=False, caps=(False, False))
+    _combat_slots(mb, floor, spread=3.9, depth_step=0.8)
+    mb.socket("emperor_mark", (0, 2.8, floor))
+    mb.socket("core", (0, 4.9, floor + 2.8))
+
+
+def marble_isle(mb, hq):
+    """Act V floating marble estate island for Free Skies in The Sovereign Stratum."""
+    rng = random.Random(501)
+    sides = _q(hq, 14, 8)
+    rows = (
+        [(0.9, 0.0, 0.1), (4.6, 4.6, 0.35), (8.6, 8.8, 0.35), (10.5, 11.2, 0.2)]
+        if hq
+        else [(1.1, 0.0, 0.05), (6.4, 6.2, 0.35), (10.4, 11.2, 0.2)]
+    )
+    top = _closed_rock_island(mb, rng, rows, sides, top_color="enamel", under=("rock_dark", "rock"), lump=0.10)
+    # Glowing Lift-Stone anchor crystal beneath the spire.
+    with mb.xf(Matrix.Translation((0, 0, -0.4))):
+        mb.lathe([(0.15, -2.2), (0.85, -0.5), (0.5, 0.4)], _q(hq, 6, 4), "liftstone", smooth=False)
+    # Central marble & gold rotunda pavilion.
+    with mb.xf(Matrix.Translation((0, 0, top + 0.05))):
+        mb.lathe([(6.2, 0.0), (6.2, 0.7), (5.0, 0.85), (5.0, 3.8), (3.6, 4.9), (1.2, 6.2), (0.18, 7.2)], _q(hq, 12, 8), lambda i, _j: ("enamel", "gold", "cloth_white", "gold", "gold", "gold")[i], smooth=False)
+    cols = _q(hq, 8, 4)
+    for i in range(cols):
+        a = 2 * math.pi * i / cols
+        mb.tube((5.4 * math.cos(a), 5.4 * math.sin(a), top + 0.75), (5.4 * math.cos(a), 5.4 * math.sin(a), top + 3.9), 0.28, sides=4, color="enamel")

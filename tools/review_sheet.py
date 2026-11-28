@@ -3,6 +3,7 @@
 rigged characters. Prints triangle counts against the tier budget. Builds from the builders, exports nothing.
 
     python3 tools/review_sheet.py SK_Ivo SM_Prop_LightningStaff [--out DIR] [--hq-only] [--verbose]
+    python3 tools/review_sheet.py SK_Krag --hq-only --pose AnchorSlam:10 --pose AnchorSlam:18   # check own moves
 
 Open the printed sheet path once per iteration; that's the whole review.
 """
@@ -37,6 +38,12 @@ def main():
     if "--out" in args:
         out = Path(args[args.index("--out") + 1])
         del args[args.index("--out"):args.index("--out") + 2]
+    poses = []
+    while "--pose" in args:
+        i = args.index("--pose")
+        clip, _, frame = args[i + 1].partition(":")
+        poses.append((clip, int(frame or 0)))
+        del args[i:i + 2]
     qualities = ("HQ",) if "--hq-only" in args else ("HQ", "LQ")
     bases = [a.rsplit("_", 1)[0] if a.endswith(("_HQ", "_LQ")) else a for a in args if not a.startswith("--")]
     if not bases:
@@ -57,7 +64,7 @@ def main():
             scene = bpy.context.scene
             meshes = [o for o in scene.objects if o.type == "MESH"]
             armature = next((o for o in scene.objects if o.type == "ARMATURE"), None)
-            rows.append(review.render_row(meshes, armature))
+            rows.append(review.render_row(meshes, armature, poses))
         path = review.write_sheet(rows, out / f"{base}.png")
         print(f"[review] sheet: {path}")
 

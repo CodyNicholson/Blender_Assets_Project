@@ -60,8 +60,9 @@ def _walk_action():
     return None
 
 
-def render_row(objects, armature=None):
-    """Front, three-quarter and back at rest, plus a mid-walk three-quarter when there's a rig."""
+def render_row(objects, armature=None, poses=None):
+    """Front, three-quarter and back at rest, plus a mid-walk three-quarter when there's a rig. poses adds a
+    three-quarter view of each (clip, frame) asked for, to check a character's own moves."""
     scene = bpy.context.scene
     _setup(scene)
     low, high = _bounds(objects)
@@ -97,6 +98,18 @@ def render_row(objects, armature=None):
             print(f"[review] posed: {action.name} frame {scene.frame_current}")
             armature.animation_data.action = None
             scene.frame_set(int(start))
+        for clip, frame in poses or []:
+            action = bpy.data.actions.get(clip)
+            if action is None:
+                print(f"[review] no clip {clip}")
+                continue
+            armature.animation_data.action = action
+            scene.frame_set(frame)
+            bpy.context.view_layer.update()
+            row.append(shoot(f"pose_{clip}_{frame}", POSE_YAW))
+            print(f"[review] posed: {clip} frame {frame}")
+            armature.animation_data.action = None
+            scene.frame_set(0)
     bpy.data.objects.remove(camera)
     return row
 

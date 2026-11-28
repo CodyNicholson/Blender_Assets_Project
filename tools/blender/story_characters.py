@@ -3673,6 +3673,367 @@ def may_soldier(ctx):
                 mb.box(tuple(cop_pos), (0.045 * s, 0.018 * s, 0.035 * s), "gold")
 
 
+def cassian_unleashed(ctx):
+    """Grand Admiral Cassian in Phase 2: redesigned from T_Portrait_CassianUnleashed_HQ.png —
+    swept-back wild long grey-and-cobalt hair, silver goatee, furious snarling teeth, forked crimson
+    right-eye scar, high gold-trimmed navy collar, gold gorget with imperial star-cross medallion,
+    royal-blue gold-trimmed lapels with ribbons and medals, grand fringed epaulettes + aiguillette."""
+    mb, q, s, w, g, hq = ctx.mb, ctx.q, ctx.s, ctx.w, ctx.g, ctx.hq
+
+    def surf(x, z, offset=0.0):
+        return _surface_y(ctx, _COAT_FRONT, abs(x), z) - offset * s
+
+    # 1. White imperial captain's coat, navy waist sash, white trousers, navy-cuffed boots.
+    long_coat(ctx, "cloth_white", "cloth_white", tail_len=0.30)
+    sash(ctx, "navy", tail=True)
+    _boot_cuffs(ctx, "navy", flare=1.16, cords="gold")
+
+    with mb.bound_to("hips"):
+        sash_r = 0.215 * w * s * (g ** 0.3)
+        mb.box((0, -sash_r - 0.008 * s, 0.885 * s), (0.075 * s, 0.018 * s, 0.068 * s), "gold")
+        if hq:
+            # Gold trim along the actual front edges of the open coat tails (angle -10 deg / 190 deg).
+            for sign in (1, -1):
+                a_hem = math.radians(-10 if sign == 1 else 190)
+                ca_h, sa_h = math.cos(a_hem), math.sin(a_hem)
+                mb.tube(
+                    (0.235 * s * w * ca_h, 0.17 * g * s * sa_h, 0.93 * s),
+                    (0.30 * s * w * ca_h, 0.23 * g * s * sa_h, 0.31 * s),
+                    0.008 * s, sides=4, color="gold",
+                )
+
+    # 2. Ornate chest: high gold-rimmed navy collar, gold gorget + star cross, royal-blue lapels, ribbons & medals.
+    with mb.bound_to("chest"):
+        # High flared upturned navy collar wrapping behind and around the neck (open at front under goatee).
+        collar_segs = 10 if hq else 6
+        bot_ring, top_ring, in_bot, in_top = [], [], [], []
+        for j in range(collar_segs + 1):
+            a = math.radians(-24 + 228 * (j / collar_segs))
+            ca, sa = math.cos(a), math.sin(a)
+            r_b, r_t = 0.155 * w * s, 0.205 * w * s
+            z_b, z_t = 1.32 * s, 1.50 * s
+            bot_ring.append((r_b * ca, r_b * 0.82 * sa + 0.02 * s, z_b))
+            top_ring.append((r_t * ca, r_t * 0.82 * sa + 0.02 * s, z_t))
+            in_top.append((r_t * 0.88 * ca, r_t * 0.72 * sa + 0.02 * s, z_t))
+            in_bot.append((r_b * 0.88 * ca, r_b * 0.72 * sa + 0.02 * s, z_b))
+        mb.loft([bot_ring + list(reversed(in_bot)), top_ring + list(reversed(in_top))], "navy", smooth=False)
+        # Gold rim tracing the top and open front edges of the collar.
+        mb.path(top_ring, [0.011 * s] * len(top_ring), 4 if hq else 3, "gold")
+        for end_idx in (0, -1):
+            mb.tube(bot_ring[end_idx], top_ring[end_idx], 0.010 * s, sides=4 if hq else 3, color="gold")
+        if hq:
+            # Gold filigree scrollwork accents on the side flaps of the upturned collar.
+            for sign in (1, -1):
+                mb.path([
+                    (sign * 0.15 * w * s, -0.04 * s, 1.36 * s),
+                    (sign * 0.178 * w * s, 0.0, 1.42 * s),
+                    (sign * 0.19 * w * s, 0.06 * s, 1.45 * s),
+                ], [0.008 * s, 0.010 * s, 0.007 * s], 3, "gold")
+
+        # Curved gleaming gold neck gorget across upper chest over the crisp white shirt.
+        gorget_pts = []
+        for k in range(7 if hq else 5):
+            u = -1.0 + 2.0 * (k / (6 if hq else 4))
+            gx = u * 0.125 * w * s
+            gz = (1.30 + 0.045 * (u * u)) * s
+            gorget_pts.append((gx, surf(gx, gz, 0.018), gz))
+        mb.path(gorget_pts, [0.020 * s] * len(gorget_pts), 5 if hq else 3, "gold")
+
+        # Imperial gold Maltese star-cross medallion hanging center-chest right beneath the gorget.
+        mx, mz = 0.0, 1.21 * s
+        my = surf(mx, mz, 0.022)
+        mb.box((mx, my, mz), (0.075 * s, 0.016 * s, 0.022 * s), "gold")
+        mb.box((mx, my, mz), (0.022 * s, 0.016 * s, 0.075 * s), "gold")
+        if hq:
+            mb.sphere((mx, my - 0.006 * s, mz), 0.018 * s, 6, 3, "gold_dark", smooth=False)
+            mb.tube((mx, surf(mx, 1.29 * s, 0.019), 1.29 * s), (mx, my, mz + 0.03 * s), 0.007 * s, sides=3, color="gold")
+
+        # Wide royal-blue turned-back lapels flanking the open white shirt, sitting cleanly proud of the coat.
+        for sign in (1, -1):
+            lapel_pts = [
+                (sign * 0.08 * w * s, surf(0.08 * w * s, 1.34 * s, 0.016), 1.34 * s),
+                (sign * 0.21 * w * s, surf(0.21 * w * s, 1.30 * s, 0.018), 1.30 * s),
+                (sign * 0.175 * w * s, surf(0.175 * w * s, 1.07 * s, 0.018), 1.07 * s),
+                (sign * 0.068 * w * s, surf(0.068 * w * s, 1.07 * s, 0.016), 1.07 * s),
+            ]
+            if sign == -1:
+                lapel_pts_wound = list(reversed(lapel_pts))
+            else:
+                lapel_pts_wound = lapel_pts
+            mb.plate(lapel_pts_wound, 0.016 * s, "navy")
+            # Gold outer lapel trim + top corner gold button.
+            mb.path([
+                Vector(lapel_pts[0]) + Vector((0, -0.008 * s, 0)),
+                Vector(lapel_pts[1]) + Vector((0, -0.009 * s, 0)),
+                Vector(lapel_pts[2]) + Vector((0, -0.009 * s, 0)),
+            ], [0.007 * s] * 3, 4 if hq else 3, "gold")
+            mb.sphere(Vector(lapel_pts[1]) + Vector((-sign * 0.028 * s, -0.014 * s, -0.03 * s)), 0.015 * s, 6 if hq else 4, 3, "gold", smooth=False)
+
+        # Military ribbon bars on right lapel (-X, viewer's left in portrait).
+        for row_i, gz in enumerate((1.17, 1.13)):
+            rx = -0.12 * w * s
+            ry = surf(rx, gz * s, 0.028)
+            cols = ("gem_blue", "gold", "gem_red") if row_i == 0 else ("grass", "gold", "cloth_blue")
+            if hq:
+                for k, c in enumerate(cols):
+                    mb.box((rx + (k - 1) * 0.022 * s, ry, gz * s), (0.020 * s, 0.012 * s, 0.018 * s), c)
+            else:
+                mb.box((rx, ry, gz * s), (0.06 * s, 0.012 * s, 0.018 * s), cols[0])
+
+        # Hanging imperial medals on left lapel (+X, viewer's right in portrait).
+        for k, c in enumerate(("gem_red", "grass", "gem_blue") if hq else ("gem_red", "gem_blue")):
+            lx = (0.095 + k * 0.026) * w * s
+            ly = surf(lx, 1.15 * s, 0.028)
+            mb.box((lx, ly, 1.155 * s), (0.020 * s, 0.012 * s, 0.032 * s), c)
+            mb.sphere((lx, ly - 0.004 * s, 1.128 * s), 0.011 * s, 5 if hq else 3, 2, "gold", smooth=False)
+
+        # Grand oversized gold fringed epaulettes + braided gold aiguillette cord on right shoulder (-X).
+        for sign in (1, -1):
+            mb.box((sign * 0.30 * w * s, 0, 1.335 * s), (0.23 * s, 0.19 * s, 0.058 * s), "gold", top_scale=0.82)
+            mb.box((sign * 0.25 * w * s, 0, 1.365 * s), (0.14 * s, 0.13 * s, 0.024 * s), "gold_dark", top_scale=0.85)
+            tassels = 5 if hq else 3
+            for k in range(tassels):
+                ty = (-0.065 + 0.13 * (k / max(1, tassels - 1))) * s
+                mb.tube((sign * 0.41 * w * s, ty, 1.325 * s), (sign * 0.43 * w * s, ty, 1.21 * s), 0.014 * s, sides=4 if hq else 3, color="gold")
+        # Braided gold aiguillette cord sweeping from right epaulette (-X) across chest.
+        mb.path([
+            (-0.31 * w * s, -0.05 * s, 1.32 * s),
+            (-0.27 * w * s, -0.14 * g * s, 1.22 * s),
+            (-0.19 * w * s, -0.18 * g * s, 1.13 * s),
+            (-0.14 * w * s, -0.185 * g * s, 1.20 * s),
+        ], [0.014 * s, 0.018 * s, 0.015 * s, 0.010 * s], 4 if hq else 3, "gold")
+
+    # Wide flared navy sleeve cuffs trimmed in gold.
+    for side, sign in (("L", 1), ("R", -1)):
+        elbow, wrist = (Vector(p) for p in ctx.joints[f"lower_arm.{side}"])
+        r1 = 0.05 * s * g * ctx.hero.arm_bulk
+        with mb.bound_to(f"lower_arm.{side}"):
+            mb.tube(elbow.lerp(wrist, 0.66), elbow.lerp(wrist, 0.96), r1 * 1.38, r1 * 1.65, sides=8 if hq else 4, color="navy")
+            mb.tube(elbow.lerp(wrist, 0.94), elbow.lerp(wrist, 0.98), r1 * 1.70, sides=8 if hq else 4, color="gold")
+            if hq:
+                mb.sphere(elbow.lerp(wrist, 0.80) + Vector((sign * 0.35, -1, 0)).normalized() * r1 * 1.56, 0.012 * s, 4, 3, "gold", smooth=False)
+
+    # 3. Wild long swept-back grey and cobalt-blue hair (matching portrait silhouette).
+    hair_cap(ctx)
+    with mb.bound_to("head"):
+        # Swept-back wave locks arching off the hairline and temples (no stiff vertical crown spikes).
+        crown_waves = (
+            (-0.13, 0.14, "hair_gray"),
+            (-0.07, 0.17, "hair_white"),
+            (-0.01, 0.19, "hair_gray"),
+            (0.06, 0.18, "gem_blue"),
+            (0.13, 0.14, "hair_white"),
+        ) if hq else (
+            (-0.10, 0.15, "hair_gray"),
+            (0.0, 0.18, "hair_white"),
+            (0.09, 0.16, "gem_blue"),
+        )
+        for ox, z_top, col in crown_waves:
+            mb.path([
+                _at(ctx, ox * 0.8, -0.10, 0.14),
+                _at(ctx, ox * 1.1, 0.02, z_top + 0.03),
+                _at(ctx, ox * 1.4, 0.18, z_top),
+                _at(ctx, ox * 1.65, 0.31, z_top - 0.12),
+            ], [0.032 * s, 0.050 * s, 0.044 * s, 0.012 * s], 5 if hq else 3, col)
+
+        # Signature swept-forward & arched silver-white forelock curving down over right temple (-X).
+        mb.path([
+            _at(ctx, 0.02, -0.06, 0.19),
+            _at(ctx, -0.08, -0.16, 0.16),
+            _at(ctx, -0.18, -0.12, 0.08),
+            _at(ctx, -0.22, 0.04, -0.02),
+        ], [0.028 * s, 0.038 * s, 0.032 * s, 0.012 * s], 5 if hq else 3, "hair_white")
+
+        # Swept side-locks arching dramatically outward past temples & ears.
+        for sign in (1, -1):
+            mb.path([
+                _at(ctx, sign * 0.14, -0.07, 0.11),
+                _at(ctx, sign * 0.24, 0.04, 0.05),
+                _at(ctx, sign * 0.30, 0.18, -0.04),
+            ], [0.040 * s, 0.050 * s, 0.015 * s], 5 if hq else 3, "gem_blue")
+
+    # Windswept shoulder-and-back mane bound to chest: fans outward around high collar & cascades down back.
+    with mb.bound_to("chest"):
+        mane = (
+            (-0.22, -0.36, 0.08, 0.20, -0.32, "hair_white"),
+            (-0.18, -0.32, 0.14, 0.25, -0.44, "gem_blue"),
+            (-0.11, -0.20, 0.18, 0.28, -0.56, "hair_gray"),
+            (0.00, 0.00, 0.20, 0.30, -0.60, "hair_white"),
+            (0.11, 0.20, 0.18, 0.28, -0.56, "cloth_blue"),
+            (0.18, 0.32, 0.14, 0.25, -0.44, "hair_gray"),
+            (0.22, 0.36, 0.08, 0.20, -0.32, "gem_blue"),
+        ) if hq else (
+            (-0.19, -0.33, 0.10, 0.22, -0.36, "hair_white"),
+            (-0.09, -0.16, 0.18, 0.27, -0.54, "gem_blue"),
+            (0.09, 0.16, 0.18, 0.27, -0.54, "hair_gray"),
+            (0.19, 0.33, 0.10, 0.22, -0.36, "cloth_blue"),
+        )
+        for x0, x1, y0, y1, z_end, col in mane:
+            mb.path([
+                _at(ctx, x0, y0, 0.04),
+                _at(ctx, (x0 + x1) * 0.55, (y0 + y1) * 0.52, z_end * 0.42),
+                _at(ctx, x1, y1, z_end * 0.78),
+                _at(ctx, x1 * 1.08, y1 * 0.92, z_end),
+            ], [0.046 * s, 0.060 * s, 0.048 * s, 0.012 * s], 5 if hq else 3, col)
+
+    # 4. Sculpted silver chin goatee (clean tan jawline), snarling teeth, furrowed brows, and forked crimson scar.
+    with mb.bound_to("head"):
+        # Pointed silver-white goatee strictly on the chin (no full beard covering cheeks).
+        mb.plate([
+            _at(ctx, -0.068, -0.155, -0.135),
+            _at(ctx, 0.068, -0.155, -0.135),
+            _at(ctx, 0.052, -0.175, -0.195),
+            _at(ctx, 0.0, -0.185, -0.245),
+            _at(ctx, -0.052, -0.175, -0.195),
+        ], 0.045 * s, "hair_white")
+        if hq:
+            mb.plate([
+                _at(ctx, -0.032, -0.176, -0.145),
+                _at(ctx, 0.032, -0.176, -0.145),
+                _at(ctx, 0.0, -0.195, -0.235),
+            ], 0.024 * s, "hair_gray")
+
+        # Exaggerated forked crimson scar across right forehead, eye, and cheek (visible in HQ and LQ).
+        mb.path([
+            _at(ctx, -0.042, -0.198, 0.145),
+            _at(ctx, -0.078, -0.212, 0.045),
+            _at(ctx, -0.088, -0.208, -0.035),
+            _at(ctx, -0.102, -0.195, -0.115),
+        ], [0.007 * s, 0.014 * s, 0.012 * s, 0.005 * s], 4 if hq else 3, "gem_red")
+        # Secondary outer fork down right cheek.
+        mb.path([
+            _at(ctx, -0.082, -0.208, 0.015),
+            _at(ctx, -0.125, -0.196, -0.045),
+            _at(ctx, -0.148, -0.178, -0.115),
+        ], [0.006 * s, 0.011 * s, 0.005 * s], 4 if hq else 3, "gem_red")
+
+        # Furious snarling mouth with clenched white teeth & heavy angry silver-grey brows.
+        if hq:
+            for sign in (1, -1):
+                mb.tube(_at(ctx, sign * 0.025, -0.198, 0.056), _at(ctx, sign * 0.122, -0.174, 0.092), 0.013 * s, sides=4, color="hair_gray")
+            mb.box(tuple(_at(ctx, 0.0, -0.184, -0.098)), (0.096 * s, 0.024 * s, 0.038 * s), "abyss")
+            mb.box(tuple(_at(ctx, 0.0, -0.190, -0.098)), (0.082 * s, 0.016 * s, 0.024 * s), "eye_white")
+            mb.box(tuple(_at(ctx, 0.0, -0.196, -0.098)), (0.082 * s, 0.008 * s, 0.005 * s), "abyss")
+        else:
+            mb.box(tuple(_at(ctx, 0.0, -0.176, -0.098)), (0.086 * s, 0.024 * s, 0.030 * s), "abyss")
+            mb.box(tuple(_at(ctx, 0.0, -0.184, -0.098)), (0.072 * s, 0.014 * s, 0.018 * s), "eye_white")
+
+
+def exchequer_vaelen(ctx):
+    """Lord-Exchequer Vaelen: slim aristocratic Arch-Treasurer in velvet-and-gold coat,
+    slicked silver hair, gold monocle on chain, treasury ledger medallion, and high starched collar."""
+    mb, s, w, g, hq = ctx.mb, ctx.s, ctx.w, ctx.g, ctx.hq
+    long_coat(ctx, "velvet", "gold_dark", tail_len=0.46)
+    sash(ctx, "gold", tail=False)
+    with mb.bound_to("chest"):
+        high_collar(ctx, "gold")
+        for sign in (1, -1):
+            mb.box((sign * 0.25 * w * s, 0, 1.33 * s), (0.14 * s, 0.14 * s, 0.036 * s), "gold", top_scale=0.82)
+        for z in ((1.28, 1.21, 1.14, 1.07) if hq else (1.24, 1.12)):
+            for sign in (1, -1):
+                x = sign * 0.11 * w * s
+                y = _surface_y(ctx, _COAT_FRONT, x, z * s) - 0.01 * s
+                mb.sphere((x, y, z * s), 0.013 * s, 5 if hq else 3, 3, "gold", smooth=False)
+        # Treasury seal medallion at chest center.
+        my = _surface_y(ctx, _COAT_FRONT, 0.0, 1.25 * s) - 0.018 * s
+        mb.box((0.0, my, 1.25 * s), (0.065 * s, 0.016 * s, 0.065 * s), "gold")
+        mb.sphere((0.0, my - 0.01 * s, 1.25 * s), 0.018 * s, 6 if hq else 4, 3, "gem_red", smooth=False)
+    _boot_cuffs(ctx, "gold_dark", flare=1.08)
+    hair_slick(ctx)
+    with mb.bound_to("head"):
+        # Gold-rimmed monocle over right eye (-X) with chain.
+        rim = [_at(ctx, -0.078 + 0.042 * math.cos(a), -0.20, 0.03 + 0.042 * math.sin(a)) for a in [2 * math.pi * k / (10 if hq else 6) for k in range(11 if hq else 7)]]
+        mb.path(rim, [0.006 * s] * len(rim), 4 if hq else 3, "gold")
+        if hq:
+            mb.path([rim[7], _at(ctx, -0.11, -0.19, -0.11), _at(ctx, -0.10, -0.15, -0.24)], [0.003 * s] * 3, 3, "gold")
+        mb.sphere(_at(ctx, 0, -0.184, -0.11), (0.024 * s, 0.008 * s, 0.009 * s), 5 if hq else 3, 2, "skin_dark", smooth=False)
+
+
+def marshal_vance(ctx):
+    """High-Marshal Aurelia Vance: ivory-and-gold Praetorian cuirass, layered pauldrons,
+    crimson-lined cape, high collar, swept-back platinum hair, and imperial star crest."""
+    mb, s, w, g, hq = ctx.mb, ctx.s, ctx.w, ctx.g, ctx.hq
+    cuirass(ctx, "cloth_white", "gold")
+    pauldrons(ctx, "gold", spiked=False, trim="gem_red")
+    cape(ctx, "velvet", length=0.38, lining="cloth_white")
+    sash(ctx, "gold", tail=True)
+    _boot_cuffs(ctx, "cloth_white", flare=1.12, cords="gold")
+    with mb.bound_to("chest"):
+        high_collar(ctx, "gold")
+        my = _surface_y(ctx, _COAT_FRONT, 0.0, 1.24 * s) - 0.026 * s
+        mb.box((0.0, my, 1.24 * s), (0.068 * s, 0.015 * s, 0.022 * s), "gold")
+        mb.box((0.0, my, 1.24 * s), (0.022 * s, 0.015 * s, 0.068 * s), "gold")
+    hair_cap(ctx)
+    with mb.bound_to("head"):
+        # Swept-back platinum-blond crest and ponytail.
+        for ox in ((-0.09, 0.0, 0.09) if hq else (0.0,)):
+            mb.path([
+                _at(ctx, ox * 0.7, -0.11, 0.14),
+                _at(ctx, ox, 0.02, 0.19),
+                _at(ctx, ox * 1.1, 0.17, 0.12),
+            ], [0.03 * s, 0.045 * s, 0.025 * s], 5 if hq else 3, "hair_white")
+        mb.path([
+            _at(ctx, 0.0, 0.17, 0.06),
+            _at(ctx, 0.0, 0.25, -0.08),
+            _at(ctx, 0.0, 0.22, -0.26),
+        ], [0.048 * s, 0.042 * s, 0.018 * s], 5 if hq else 3, "hair_white")
+
+
+def _emperor_crown(ctx, cracked=False):
+    mb, s, hq = ctx.mb, ctx.s, ctx.hq
+    with mb.bound_to("head"):
+        sides = 10 if hq else 6
+        with mb.xf(Matrix.Translation(ctx.centre)):
+            mb.lathe([(0.19 * s, 0.11 * s), (0.21 * s, 0.19 * s), (0.19 * s, 0.20 * s)], sides, "gold", smooth=False)
+        spikes = 6 if hq else 4
+        for i in range(spikes):
+            a = 2 * math.pi * i / spikes + 0.25
+            px, py = 0.19 * s * math.cos(a), 0.19 * s * math.sin(a)
+            lift = (0.04 if cracked and i % 2 == 1 else 0.0)
+            mb.tube(_at(ctx, px / s, py / s, 0.17 + lift), _at(ctx, px * 1.1 / s, py * 1.1 / s, 0.28 + lift), 0.024 * s, 0.005 * s, sides=4 if hq else 3, color="liftstone" if cracked and i == 0 else "gold")
+        mb.sphere(_at(ctx, 0.0, -0.20, 0.16), 0.024 * s, 6 if hq else 4, 3, "liftstone", smooth=False)
+
+
+def emperor_sovereign(ctx):
+    """Emperor Aurelius Corvus: tall ivory-and-gold imperial mantle, silver beard, laurel-gear crown,
+    and glowing Lift-Stone chest clasp."""
+    mb, s, w, hq = ctx.mb, ctx.s, ctx.w, ctx.hq
+    long_coat(ctx, "cloth_white", "gold", tail_len=0.28)
+    cuirass(ctx, "cloth_white", "gold")
+    epaulettes(ctx, "gold")
+    cape(ctx, "cloth_white", length=0.28, lining="gold")
+    sash(ctx, "gold", tail=True)
+    _boot_cuffs(ctx, "gold", flare=1.15)
+    with mb.bound_to("chest"):
+        high_collar(ctx, "gold")
+        my = _surface_y(ctx, _COAT_FRONT, 0.0, 1.27 * s) - 0.028 * s
+        mb.sphere((0.0, my, 1.27 * s), 0.036 * s, 6 if hq else 4, 3, "liftstone", smooth=False)
+    hair_cap(ctx)
+    beard_full(ctx, length=0.16)
+    _emperor_crown(ctx, cracked=False)
+
+
+def emperor_ascendant(ctx):
+    """Emperor Corvus, Ascendant: unleashed sovereign channeling the Prime Lift-Core —
+    cracked golden crown, Lift-Stone energy ribs across chest and shoulders, and swept storm-white hair."""
+    mb, s, w, hq = ctx.mb, ctx.s, ctx.w, ctx.hq
+    emperor_sovereign(ctx)
+    with mb.bound_to("chest"):
+        # Radiant Lift-Stone & lightning energy ribs flaring behind the shoulders.
+        for sign in (1, -1):
+            mb.path([
+                (sign * 0.22 * w * s, 0.14 * s, 1.30 * s),
+                (sign * 0.44 * w * s, 0.20 * s, 1.50 * s),
+                (sign * 0.56 * w * s, 0.14 * s, 1.72 * s),
+            ], [0.026 * s, 0.034 * s, 0.008 * s], 5 if hq else 3, "liftstone")
+            mb.path([
+                (sign * 0.20 * w * s, 0.14 * s, 1.18 * s),
+                (sign * 0.48 * w * s, 0.22 * s, 1.22 * s),
+                (sign * 0.62 * w * s, 0.16 * s, 1.38 * s),
+            ], [0.022 * s, 0.028 * s, 0.008 * s], 4 if hq else 3, "lightning")
+    _emperor_crown(ctx, cracked=True)
+
+
 FEATURES = {f.__name__: f for f in (
     drill_commodore, old_helmsman, core_keeper, gale_gunner, free_fleet_flyer, sky_duelist, syndicate_lord, scrap_captain, vane_deckhand, vane_captain, vane_king, ship_surgeon, master_gunner, stormcaller_trainee, big_guns, bosun_build, morrow_finery, nomad_layers, nomad_hair, nomad_scarf, assassin_gear, sorcerer_amulet, sorcerer_hood, sorcerer_robe, sorcerer_sleeves, hair_cap, hair_wild, hair_long, hair_braid, hair_ponytail, hair_slick, hair_side_shave, hair_multicolor_corsair, hair_gray_sides,
     beard_full, goatee, moustache, eyepatch, scar, spectacles, goggles_up, face_mask, hood, bandana, tricorn,
@@ -3680,6 +4041,7 @@ FEATURES = {f.__name__: f for f in (
     cape, sash, cross_belt, bandolier, apron, tool_belt, tabard, keyring, medals, gold_buttons, high_collar,
     scarf, grapple_gauntlet, iron_arm, chain_wrap, dagger_sheaths, navigator_case, tool_harness, ear_guards,
     torn_shoulder, skeleton_pirate, cocked_tricorn, bomb_suit, hood_drawn, hair_may_warrior, may_soldier,
+    cassian_unleashed, exchequer_vaelen, marshal_vance, emperor_sovereign, emperor_ascendant,
 )}
 
 
@@ -3703,6 +4065,14 @@ CAST = {
     "CassianAdmiral": Hero(skin="skin_light", hair="hair_gray", top="navy", legs="enamel", sleeve="enamel", glove="enamel", scale=1.06, width=1.05, brow=2, features=[
         ("hair_cap",), ("beard_full", 0.2), ("scar",), ("long_coat", "enamel", "navy"), ("epaulettes", "gold"), ("medals",), ("gold_buttons",), ("high_collar", "gold"), ("cape", "velvet", 0.26), ("bicorne", "navy", "gold"),
     ]),
+    "CassianUnleashed": Hero(
+        skin="skin_mid", hair="hair_white", brow_color="hair_gray",
+        top="cloth_white", legs="cloth_white", boots="leather_dark", belt="navy",
+        sleeve="cloth_white", forearm="cloth_white", glove="enamel",
+        scale=1.10, width=1.12, girth=1.06, arm_bulk=1.14, leg_bulk=1.08,
+        brow=3, iris="gem_blue", eye_scale=1.06, mouth=False,
+        features=[("cassian_unleashed",)],
+    ),
     "Morrow": Hero(mouth=False, skin="skin_mid", hair="hair_black", top="gold_dark", legs="cloth_brown", boots="leather_dark", belt="leather", sleeve="faction_a", forearm="faction_a", glove="leather_dark", scale=1.05, width=0.88, girth=0.84, brow=0, iris="eye_dark", features=[
         ("hair_cap",), ("morrow_finery",),
     ]),
@@ -3814,6 +4184,18 @@ CAST = {
     ]),
     "RoyalGuard": Hero(skin="skin_mid", hair="hair_black", top="silver", legs="faction_a", boots="faction_a", sleeve="silver", forearm="silver", glove="gold_dark", scale=1.08, width=1.14, girth=1.1, features=[
         ("morion", "silver", "faction_c"), ("cuirass", "silver", "gold"), ("pauldrons", "gold_dark"), ("tabard", "faction_a", "gold"), ("cape", "faction_a", 0.34),
+    ]),
+    "ExchequerVaelen": Hero(mouth=False, skin="skin_light", hair="hair_gray", brow_color="hair_gray", iris="amber", top="velvet", legs="cloth_black", boots="cloth_black", belt="gold", sleeve="velvet", forearm="velvet", glove="enamel", scale=1.06, width=0.86, girth=0.82, arm_bulk=0.82, leg_bulk=0.86, brow=1, features=[
+        ("exchequer_vaelen",),
+    ]),
+    "MarshalVance": Hero(skin="skin_light", hair="hair_white", brow_color="hair_gray", iris="gem_blue", top="cloth_white", legs="cloth_white", boots="cloth_white", belt="gold", sleeve="cloth_white", forearm="cloth_white", glove="gold", scale=1.03, width=0.94, girth=0.9, arm_bulk=0.94, leg_bulk=0.96, brow=2, features=[
+        ("marshal_vance",),
+    ]),
+    "Emperor": Hero(mouth=False, skin="skin_light", hair="hair_white", brow_color="hair_white", iris="gem_blue", top="cloth_white", legs="cloth_white", boots="gold", belt="gold", sleeve="cloth_white", forearm="cloth_white", glove="gold", scale=1.10, width=1.06, girth=1.02, arm_bulk=1.04, leg_bulk=1.04, brow=2, features=[
+        ("emperor_sovereign",),
+    ]),
+    "EmperorAscendant": Hero(mouth=False, skin="skin_light", hair="hair_white", brow_color="hair_white", iris="liftstone", top="cloth_white", legs="cloth_white", boots="gold", belt="gold", sleeve="cloth_white", forearm="cloth_white", glove="gold", scale=1.14, width=1.12, girth=1.06, arm_bulk=1.12, leg_bulk=1.08, brow=3, eye_scale=1.08, features=[
+        ("emperor_ascendant",),
     ]),
 }
 
@@ -3962,6 +4344,44 @@ VANE_CLIPS = {
         36: _p(),
     }),
 }
+
+# DiveRoll: dives forward out of the way of a heavy blow and rolls over his shoulders back up into a crouch.
+# The whole body turns once round the root bone (pivoting at the feet), so each key also places the hips where a
+# tight ball rolling along the deck would have them (_roll_hips). Airborne on frame 8, back on his feet by 20.
+_HIPS_REST = 0.8
+
+
+def _roll_hips(degrees, height, forward=0.0):
+    """The hips offset that puts them `height` above the feet and `forward` ahead (-Y) with the root turned this far."""
+    t = math.radians(degrees)
+    return (0.0, -forward * math.cos(t) + height * math.sin(t), forward * math.sin(t) + height * math.cos(t) - _HIPS_REST)
+
+
+_TUCK = dict(thigh__L=(-112, -4, 0), shin__L=(132, 0, 0), thigh__R=(-112, 4, 0), shin__R=(132, 0, 0), foot__L=(-20, 0, 0),
+             foot__R=(-20, 0, 0), spine=(22, 0, 0), chest=(36, 0, 0), head=(28, 0, 0), upper_arm__L=(-50, 12, 0),
+             lower_arm__L=(-112, 0, 0), upper_arm__R=(-50, -12, 0), lower_arm__R=(-112, 0, 0))
+_CROUCH = dict(thigh__L=(-58, -4, 0), shin__L=(84, 0, 0), foot__L=(-24, 0, 0), thigh__R=(-40, 4, 0), shin__R=(70, 0, 0),
+               foot__R=(-28, 0, 0), spine=(14, 0, 0), chest=(22, 0, 0), head=(-12, 0, 0), upper_arm__L=(-30, -16, 0),
+               lower_arm__L=(-40, 0, 0), upper_arm__R=(-34, 16, 0), lower_arm__R=(-50, 0, 0))
+# Root angle and hips height for each key: measured so the lowest point of the body just touches the deck while it
+# rolls, and clears it in the dive (scratch check: lowest vertex per frame of SK_Vane_HQ).
+_ROLL_KEYS = {6: (35, 0.82), 8: (80, 0.62), 10: (125, 0.99), 12: (170, 0.82), 14: (215, 0.35), 16: (260, 0.28),
+              18: (310, 0.20), 20: (360, 0.64)}
+_DIVE = dict(upper_arm__L=(-168, -8, 0), lower_arm__L=(-8, 0, 0), upper_arm__R=(-168, 8, 0), lower_arm__R=(-8, 0, 0),
+             thigh__L=(10, -3, 0), shin__L=(14, 0, 0), thigh__R=(16, 3, 0), shin__R=(10, 0, 0), chest=(6, 0, 0), head=(-20, 0, 0))
+_LAUNCH = dict(upper_arm__L=(-120, -8, 0), lower_arm__L=(-20, 0, 0), upper_arm__R=(-120, 8, 0), lower_arm__R=(-20, 0, 0),
+               thigh__L=(-20, -3, 0), shin__L=(30, 0, 0), thigh__R=(4, 3, 0), shin__R=(20, 0, 0), chest=(14, 0, 0), head=(-14, 0, 0))
+_ROLL_POSES = {6: _LAUNCH, 8: _DIVE, 10: _TUCK, 12: _TUCK, 14: _TUCK, 16: _TUCK, 18: _TUCK, 20: _CROUCH}
+VANE_CLIPS["DiveRoll"] = (False, {
+    0: _p(),
+    4: _p(**{**_CROUCH, "upper_arm__L": (30, -10, 0), "upper_arm__R": (30, 10, 0)}, hips_loc=_roll_hips(0, 0.64)),
+    **{frame: _p(root=(angle, 0, 0), **_ROLL_POSES[frame], hips_loc=_roll_hips(angle, height))
+       for frame, (angle, height) in _ROLL_KEYS.items()},
+    24: _p(root=(360, 0, 0), **{**_CROUCH, "thigh__L": (-30, -4, 0), "shin__L": (44, 0, 0), "thigh__R": (-20, 4, 0), "shin__R": (36, 0, 0)},
+           hips_loc=_roll_hips(360, 0.75)),
+    32: _p(root=(360, 0, 0)),
+})
+
 # Who gets extra clips: CAST name -> clips.
 EXTRA_CLIPS = {"Vane": VANE_CLIPS, "VaneCaptain": VANE_CLIPS, "VaneKing": VANE_CLIPS}
 
@@ -4047,6 +4467,51 @@ MORROW_CLIPS = {
     }),
 }
 EXTRA_CLIPS["Morrow"] = MORROW_CLIPS
+
+
+# ---- Krag's own moves -----------------------------------------------------------------------------
+# For his cutscenes. AnchorSlam: hoists the anchor-hammer two-handed high over his head, wrists cocked so its head
+# rises up and back behind him, holds there a beat, then brings it over the top in one huge blow into the deck.
+# The weapon bone points forward from the fist, so the haft's angle is the sum of the X turns of spine, chest,
+# arm and hand (rest 54 degrees above forward): 150 at the top, 75 mid-swing, -30 on the deck. Lands on frame 21.
+# Roar: sucks in a breath, then throws his chest out, head back and arms wide and bellows. Peaks on frame 16.
+_SLAM_LIFT = dict(upper_arm__R=(-110, 10, 0), lower_arm__R=(-30, 0, 0), hand__R=(20, 0, 0),
+                  upper_arm__L=(-104, -12, 0), lower_arm__L=(-34, 0, 0), chest=(-8, 0, 0), spine=(-4, 0, 0), head=(-6, 0, 0),
+                  thigh__L=(-6, -4, 0), shin__L=(8, 0, 0), thigh__R=(6, 4, 0), hips_loc=(0, 0.03, 0.0))
+_SLAM_HIGH = dict(upper_arm__R=(-155, 10, 0), lower_arm__R=(-9, 0, 0), hand__R=(50, 0, 0),
+                  upper_arm__L=(-150, -12, 0), lower_arm__L=(-12, 0, 0), chest=(-26, 0, 0), spine=(-10, 0, 0), head=(-12, 0, 0),
+                  thigh__L=(-8, -4, 0), shin__L=(8, 0, 0), thigh__R=(8, 4, 0), foot__L=(16, 0, 0), foot__R=(16, 0, 0),
+                  hips_loc=(0, 0.06, 0.05))
+_SLAM_OVER = dict(upper_arm__R=(-115, 6, 0), lower_arm__R=(-10, 0, 0), hand__R=(30, 0, 0),
+                  upper_arm__L=(-112, -8, 0), lower_arm__L=(-14, 0, 0), chest=(14, 0, 0), spine=(6, 0, 0), head=(-14, 0, 0),
+                  thigh__L=(-34, -6, 0), shin__L=(34, 0, 0), thigh__R=(18, 6, 0), shin__R=(14, 0, 0), hips_loc=(0, -0.08, -0.08))
+_SLAM_DOWN = dict(upper_arm__R=(-30, 0, 0), lower_arm__R=(-2, 0, 0), hand__R=(0, 0, 0),
+                  upper_arm__L=(-34, -8, 0), lower_arm__L=(-20, 0, 0), chest=(44, 0, 0), spine=(18, 0, 0), head=(-26, 0, 0),
+                  thigh__L=(-52, -6, 0), shin__L=(54, 0, 0), thigh__R=(28, 6, 0), shin__R=(30, 0, 0), hips_loc=(0, -0.18, -0.22))
+_ROAR = dict(upper_arm__L=(-24, -78, 0), lower_arm__L=(-48, 0, 0), upper_arm__R=(-24, 78, 0), lower_arm__R=(-48, 0, 0),
+             chest=(-22, 0, 0), spine=(-8, 0, 0), head=(-28, 0, 0), thigh__L=(-6, -10, 0), shin__L=(10, 0, 0),
+             thigh__R=(-6, 10, 0), shin__R=(10, 0, 0), hips_loc=(0, 0, -0.08))
+KRAG_CLIPS = {
+    "AnchorSlam": (False, {
+        0: _p(),
+        6: _p(**_SLAM_LIFT),
+        12: _p(**_SLAM_HIGH),
+        16: _p(**{**_SLAM_HIGH, "chest": (-30, 0, 0), "upper_arm__R": (-158, 10, 0), "upper_arm__L": (-153, -12, 0), "hips_loc": (0, 0.07, 0.07)}),
+        19: _p(**_SLAM_OVER),
+        21: _p(**_SLAM_DOWN),
+        30: _p(**{**_SLAM_DOWN, "chest": (40, 0, 0), "head": (-30, 0, 0)}),
+        46: _p(),
+    }),
+    "Roar": (False, {
+        0: _p(),
+        8: _p(chest=(16, 0, 0), spine=(6, 0, 0), head=(10, 0, 0), upper_arm__L=(-14, 10, 0), upper_arm__R=(-14, -10, 0),
+              lower_arm__L=(-40, 0, 0), lower_arm__R=(-40, 0, 0), hips_loc=(0, 0, -0.06)),
+        16: _p(**_ROAR),
+        34: _p(**{**_ROAR, "upper_arm__L": (-30, -84, 0), "upper_arm__R": (-30, 84, 0), "chest": (-26, 0, 0), "head": (-32, 0, 0)}),
+        48: _p(),
+    }),
+}
+EXTRA_CLIPS["Krag"] = KRAG_CLIPS
 
 
 # ---- Roxanne's own moves -----------------------------------------------------------------------------
@@ -4172,4 +4637,15 @@ ROXANNE_CLIPS = {
 }
 EXTRA_CLIPS["Roxanne"] = ROXANNE_CLIPS
 EXTRA_CLIPS["May"] = ROXANNE_CLIPS
+
+import character_styles  # noqa: E402
+character_styles.register(
+    FEATURES, CAST, EXTRA_CLIPS,
+    ROOK_CLIPS=ROOK_CLIPS,
+    LYRA_CLIPS=LYRA_CLIPS,
+    SABLE_CLIPS=SABLE_CLIPS,
+    IVO_CLIPS=IVO_CLIPS,
+    MORROW_CLIPS=MORROW_CLIPS,
+    ROXANNE_CLIPS=ROXANNE_CLIPS,
+)
 

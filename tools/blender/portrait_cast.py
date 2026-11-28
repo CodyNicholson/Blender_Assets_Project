@@ -887,6 +887,52 @@ def cassian_admiral(p):
         p.ball((x, -0.88, -2.4), 0.08, rgb(240, 196, 84), gloss=0.9, root=p.body_root, outline=0.006)
 
 
+def cassian_unleashed(p):
+    """Phase 2 Cassian in the Lift-Core Chamber: hatless, wild long grey-and-blue hair,
+    exaggerated jagged facial scar, furious scowl, and regal white-and-gold captain's coat."""
+    p.s["smile"] = -0.14
+    skin, shade, blush = rgb(226, 178, 142), rgb(132, 92, 96), rgb(208, 108, 90)
+    silver = rgb(214, 218, 226)
+    blue_hair = rgb(44, 102, 204)
+    deep_blue = rgb(24, 38, 92)
+    gold = rgb(242, 198, 82)
+    face(p, skin, shade, blush, rgb(48, 134, 232), deep_blue,
+         inner=0.04, outer=0.19, thick=0.052,
+         up=0.052, low=0.028, lid=0.28,
+         tilt=0.032, gaze=-0.03, bags=0.65, skin_shade=shade, nose_side=1)
+    # Exaggerated jagged crimson scar across forehead, eye, and cheek.
+    p.paint.line([(-0.56, 0.54), (-0.42, 0.22), (-0.31, -0.08), (-0.38, -0.44)],
+                 [0.008, 0.028, 0.024, 0.008], rgb(188, 34, 46))
+    p.paint.line([(-0.46, 0.12), (-0.28, 0.02)], [0.012, 0.004], rgb(188, 34, 46))
+    # Deep angry furrow lines between brows.
+    p.paint.line([(-0.14, 0.44), (-0.06, 0.24)], [0.006, 0.008], shade, 0.75)
+    p.paint.line([(0.14, 0.44), (0.06, 0.24)], [0.006, 0.008], shade, 0.75)
+    finish(p, skin, shade, neck=0.4)
+    hair_cap(p, silver, line=0.52, curve=0.18, nape=-0.7, inflate=0.05)
+    _beard(p, silver, rgb(164, 170, 184), 0.24, width=0.7)
+    # Wild windswept grey and blue locks streaming behind and past the shoulders.
+    for x, dx, col, r0 in (
+        (-0.82, -0.42, silver, 0.14),
+        (-0.56, -0.32, blue_hair, 0.16),
+        (-0.24, -0.18, silver, 0.15),
+        (0.24, 0.18, blue_hair, 0.15),
+        (0.56, 0.32, silver, 0.16),
+        (0.82, 0.42, blue_hair, 0.14),
+    ):
+        p.sweep([(x * 0.75, 0.1, 0.65), (x, 0.22, 0.15), (x + dx * 0.7, 0.25, -0.55), (x + dx, 0.18, -1.45)],
+                [r0, r0 * 1.15, r0 * 0.9, 0.02], col, depth=0.6)
+    for x, z_tip, col in ((-0.45, 1.32, silver), (-0.15, 1.38, blue_hair), (0.2, 1.35, silver), (0.5, 1.28, blue_hair)):
+        p.sweep([(x * 0.6, -0.25, 0.78), (x * 0.9, -0.12, 1.08), (x * 1.15, 0.1, z_tip)],
+                [0.11, 0.13, 0.02], col, depth=0.6)
+    # Regal white & gold captain's coat over deep royal blue vest.
+    coat(p, 1.78, rgb(244, 244, 246), gold, deep_blue, gap=0.3, neck=0.52, gloss=0.15)
+    for sign in (-1, 1):
+        p.plate([(sign * 0.10, -0.72, -1.26), (sign * 0.68, -0.36, -1.14), (sign * 0.72, -0.4, -1.58), (sign * 0.12, -0.76, -1.66)],
+                0.06, gold, gloss=0.85, root=p.body_root)
+    epaulettes(p, 1.78, gold)
+    _motif_coat_buttons(p, 0.44, gold)
+
+
 def _twin(p, mirror, hair, accent, deep, iris, sneer):
     """Vex and Vesper, drawn from one set of bones and mirrored, with their temperament the only difference."""
     skin, shade, blush = rgb(232, 196, 172), rgb(138, 100, 132), rgb(214, 128, 132)
@@ -1889,6 +1935,8 @@ CAST.update({
                            crown=0.76, temple=0.8, cheek=0.8, jaw=0.76, chin=0.46, depth=0.94, brow_ridge=0.08, socket=0.06, nose_len=0.42, nose_bridge=0.22, nose_tip=0.18, nose_width=0.12, nose_hook=0.03, mouth_w=0.27, mouth_z=-0.6, eye_x=0.33),
     "CassianAdmiral": _spec(cassian_admiral, rgb(24, 36, 84), rgb(226, 186, 90), rgb(255, 224, 150), rival=True, motif="rays", turn=0.12, tilt=0.0, pitch=-0.09, body_turn=0.05, span=5.2, target=-0.2,
                             crown=0.76, temple=0.8, cheek=0.78, jaw=0.76, chin=0.46, depth=0.94, brow_ridge=0.08, socket=0.08, nose_len=0.42, nose_bridge=0.22, nose_tip=0.18, nose_width=0.12, nose_hook=0.03, mouth_w=0.24, mouth_z=-0.6, eye_x=0.33),
+    "CassianUnleashed": _spec(cassian_unleashed, rgb(20, 42, 108), rgb(242, 198, 82), rgb(255, 228, 148), rival=True, motif="rays", turn=0.14, tilt=-0.04, pitch=-0.10, body_turn=0.06, span=5.4, target=-0.24,
+                              crown=0.76, temple=0.8, cheek=0.78, jaw=0.76, chin=0.46, depth=0.94, brow_ridge=0.10, socket=0.09, nose_len=0.42, nose_bridge=0.22, nose_tip=0.18, nose_width=0.12, nose_hook=0.03, mouth_w=0.26, mouth_z=-0.6, eye_x=0.33),
     "Vex": _spec(vex, rgb(62, 24, 104), rgb(196, 120, 250), rgb(226, 170, 255), rival=True, motif="slash_l", turn=0.26, tilt=-0.09, pitch=-0.06, span=4.6, target=-0.36,
                  crown=0.68, temple=0.7, cheek=0.7, jaw=0.54, chin=0.28, depth=0.86, cheekbone=0.1, hollow=0.05, nose_len=0.4, nose_bridge=0.18, nose_tip=0.1, nose_width=0.08, mouth_w=0.22, mouth_z=-0.6, lip_low=0.035, eye_x=0.3),
     "Vesper": _spec(vesper, rgb(14, 76, 82), rgb(70, 206, 196), rgb(120, 255, 236), rival=True, motif="slash_r", turn=0.26, tilt=0.09, pitch=0.03, span=4.6, target=-0.36,

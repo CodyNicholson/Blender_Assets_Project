@@ -213,9 +213,21 @@ def free_dawn(image, x, y, z, sun, w, h):
     _sea(image, x, y, z, 701, [(-3, (204, 208, 224)), (-0.3, (234, 228, 224)), (0.28, (255, 248, 230))], 0.45, (255, 234, 204), sun)
 
 
+def sovereign_stratum(image, x, y, z, sun, w, h):
+    """Act V: crystal-clear royal cobalt zenith pouring down into gilded sunlit cloud banks."""
+    cos_sun = x * sun[0] + y * sun[1] + z * sun[2]
+    image[...] = _gradient(y, [(-1, (198, 176, 134)), (0.0, (255, 240, 196)), (0.08, (248, 226, 176)), (0.26, (112, 166, 236)), (0.58, (36, 86, 188)), (1, (20, 43, 110))])
+    _glow(image, cos_sun, (255, 244, 192), 26, 0.85)
+    _cirrus(image, x, y, z, 803, (255, 248, 224), 0.72, stretch=(0.22, 1.8), opacity=0.72, axis=0.35)
+    _disc(image, cos_sun, 3.4, (255, 252, 232))
+    _glow(image, cos_sun, (255, 242, 186), 520, 0.95)
+    _bank(image, x, y, z, 802, [(-1, (255, 248, 224)), (0.26, (242, 214, 168)), (0.72, (208, 174, 136))], 0.17, sun=sun, sun_lit=(255, 246, 200))
+    _sea(image, x, y, z, 801, [(-3, (176, 158, 134)), (-0.3, (226, 206, 174)), (0.3, (255, 242, 210))], 0.45, (255, 232, 184), sun)
+
+
 PAINTERS = {
     "CloudBreak": cloud_break, "ScrapWinds": scrap_winds, "Jetstream": jetstream, "CirrusCitadel": cirrus_citadel,
-    "Maelstrom": maelstrom, "HangarDusk": hangar_dusk, "FreeDawn": free_dawn,
+    "Maelstrom": maelstrom, "HangarDusk": hangar_dusk, "FreeDawn": free_dawn, "SovereignStratum": sovereign_stratum,
 }
 
 
